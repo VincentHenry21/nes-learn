@@ -119,6 +119,7 @@ var LEVEL_ORDER = ["A1","A2","B1","B2","C1","C2"];
 var LEVEL_NAMES = {A1:"Beginner",A2:"Elementary",B1:"Intermediate",B2:"Upper Intermediate",C1:"Advanced",C2:"Mastery"};
 var LEVEL_THEMES = {A1:"greetings, numbers, family, and food",A2:"daily life, travel, and work",B1:"opinions, culture, and current topics",B2:"argumentation and professional life",C1:"academic and abstract topics",C2:"nuance, idiom, and register"};
 function esc(s){return String(s).replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;").replace(/"/g,"&quot;");}
+function q(s){return "'"+String(s).replace(/'/g,"\\'")+"'";}
 function todayStr(d){d=d||new Date();return d.getFullYear()+"-"+String(d.getMonth()+1).padStart(2,"0")+"-"+String(d.getDate()).padStart(2,"0");}
 function yesterdayStr(){var d=new Date();d.setDate(d.getDate()-1);return todayStr(d);}
 function blankLang(){return {doneLessons:[],examPass:{},examScores:{},testHistory:[],savedWords:[],learnedWords:[],studySeconds:0,lastStudyDate:"",streak:0,activity:{},cert:{}};}
@@ -208,7 +209,7 @@ function renderQuiz(){
   var html=sheetHead(QUIZ.title,"Question "+(QUIZ.idx+1)+" of "+QUIZ.questions.length+" · "+esc(q.skill));
   html+='<div class="progress-track" style="margin:14px 0"><div class="progress-fill" style="width:'+Math.round(QUIZ.idx/QUIZ.questions.length*100)+'%"></div></div>';
   html+='<p style="font-size:18px;color:var(--ink);font-weight:600">'+esc(q.q)+'</p>';
-  if(q.play){html+='<button class="btn btn-sm" type="button" onclick="speak('+JSON.stringify(q.play)+','+JSON.stringify(QUIZ.code)+')">Listen</button>';}
+  if(q.play){html+='<button class="btn btn-sm" type="button" onclick="speak('+q(q.play)+','+q(QUIZ.code)+')">Listen</button>';}
   q.options.forEach(function(o,i){html+='<button class="opt" type="button" onclick="answerQuiz('+i+')">'+esc(o)+'</button>';});
   if(q.write){
     html+='<label>Your answer</label><input class="input" id="writeAns" placeholder="Type the word here"><button class="btn btn-primary btn-block" style="margin-top:10px" type="button" onclick="answerWrite()">Check answer</button>';
@@ -257,7 +258,7 @@ function showResults(){
   html+='<h4>Areas to improve</h4><p>'+esc(weakList.join(", "))+'</p>';
   html+='<h4>Recommended next lessons</h4>';
   var rec=recommendedLessons(QUIZ.code,QUIZ.level,weakList);
-  html+=rec.map(function(l){return '<button class="btn btn-block" style="margin:6px 0" type="button" onclick="openLesson('+JSON.stringify(QUIZ.code)+','+JSON.stringify(QUIZ.level)+','+l.idx+')">'+esc(l.title)+'</button>';}).join("");
+  html+=rec.map(function(l){return '<button class="btn btn-block" style="margin:6px 0" type="button" onclick="openLesson('+q(QUIZ.code)+','+q(QUIZ.level)+','+l.idx+')">'+esc(l.title)+'</button>';}).join("");
   html+='<h4>Level progress</h4><p>Overall progress in '+esc(LANG_DB[QUIZ.code].name)+' is now '+before+'%. Level '+QUIZ.level+' exam status: '+(QUIZ.examLevel?(st.examPass[QUIZ.examLevel]?"Passed":"Not yet passed, 70% needed"):"practice only")+'.</p>';
   html+='<button class="btn btn-primary btn-block" type="button" onclick="closeSheet();render()">Done</button>';
   if(QUIZ.onDone)QUIZ.onDone(pct);
@@ -291,7 +292,7 @@ function writingQuestions(code,level,n){
 // ---- Lessons ----
 function wordCard(code,w){
   var st=langState(code);var saved=st.savedWords.indexOf(w.id)>=0;
-  return '<div class="word-row"><div style="flex:1;min-width:0"><div class="word-big">'+esc(w.w)+'</div><div class="word-gloss">'+esc(w.gloss)+'</div>'+(w.hint?'<div class="word-hint">'+esc(w.hint)+'</div>':'')+'<div class="word-gloss">'+esc(w.frame)+'</div></div><div style="display:flex;flex-direction:column;gap:6px"><button class="btn btn-sm" type="button" onclick="speak('+JSON.stringify(w.w)+','+JSON.stringify(code)+')">Listen</button><button class="btn btn-sm" type="button" onclick="toggleSave('+JSON.stringify(code)+','+JSON.stringify(w.id)+')">'+(saved?'Saved ✓':'Save')+'</button></div></div>';
+  return '<div class="word-row"><div style="flex:1;min-width:0"><div class="word-big">'+esc(w.w)+'</div><div class="word-gloss">'+esc(w.gloss)+'</div>'+(w.hint?'<div class="word-hint">'+esc(w.hint)+'</div>':'')+'<div class="word-gloss">'+esc(w.frame)+'</div></div><div style="display:flex;flex-direction:column;gap:6px"><button class="btn btn-sm" type="button" onclick="speak('+q(w.w)+','+q(code)+')">Listen</button><button class="btn btn-sm" type="button" onclick="toggleSave('+q(code)+','+q(w.id)+')">'+(saved?'Saved ✓':'Save')+'</button></div></div>';
 }
 function toggleSave(code,id){var st=langState(code);var i=st.savedWords.indexOf(id);if(i>=0)st.savedWords.splice(i,1);else st.savedWords.push(id);save();toast(i>=0?"Removed from saved words":"Saved word");render();}
 function openLesson(code,level,idx){
@@ -302,18 +303,18 @@ function openLesson(code,level,idx){
     var words=idx===0?lv.vocab.slice(0,10):lv.vocab.slice(10,20);
     html+='<p>Study these words, listen to each one, then take the spelling check to complete the lesson.</p>';
     html+=words.map(function(w){return wordCard(code,w);}).join("");
-    html+='<button class="btn btn-primary btn-block" style="margin-top:12px" type="button" onclick="startQuiz({code:'+JSON.stringify(code)+',level:'+JSON.stringify(level)+',title:'+JSON.stringify(meta.title+" check")+',lessonId:'+JSON.stringify(lid)+',questions:writingQuestions('+JSON.stringify(code)+','+JSON.stringify(level)+',5)})">Start spelling check</button>';
+    html+='<button class="btn btn-primary btn-block" style="margin-top:12px" type="button" onclick="startQuiz({code:'+q(code)+',level:'+q(level)+',title:'+q(meta.title+" check")+',lessonId:'+q(lid)+',questions:writingQuestions('+q(code)+','+q(level)+',5)})">Start spelling check</button>';
   } else if(meta.kind==="grammar"){
     var g=lv.grammar[idx-2];
     html+='<p>'+esc(g.body)+'</p><p class="note">Language focus: '+esc(LANG_DB[code].scriptNote)+'</p>';
-    html+='<button class="btn btn-primary btn-block" type="button" onclick="startQuiz({code:'+JSON.stringify(code)+',level:'+JSON.stringify(level)+',title:'+JSON.stringify(meta.title+" check")+',lessonId:'+JSON.stringify(lid)+',questions:vocabQuestions('+JSON.stringify(code)+','+JSON.stringify(level)+',3,[\'Grammar\'])})">Start grammar check</button>';
+    html+='<button class="btn btn-primary btn-block" type="button" onclick="startQuiz({code:'+q(code)+',level:'+q(level)+',title:'+q(meta.title+" check")+',lessonId:'+q(lid)+',questions:vocabQuestions('+q(code)+','+q(level)+',3,[\'Grammar\'])})">Start grammar check</button>';
   } else if(meta.kind==="reading"){
     html+='<p>Read the passage, then answer the questions.</p><div class="card" style="box-shadow:none"><p style="color:var(--ink);font-size:17px">'+lv.reading.passage.map(function(s){return esc(s);}).join(" ")+'</p></div>';
-    html+='<button class="btn btn-primary btn-block" style="margin-top:12px" type="button" onclick="startQuiz({code:'+JSON.stringify(code)+',level:'+JSON.stringify(level)+',title:'+JSON.stringify(meta.title+" check")+',lessonId:'+JSON.stringify(lid)+',questions:readingQuestions('+JSON.stringify(code)+','+JSON.stringify(level)+')})">Start reading questions</button>';
+    html+='<button class="btn btn-primary btn-block" style="margin-top:12px" type="button" onclick="startQuiz({code:'+q(code)+',level:'+q(level)+',title:'+q(meta.title+" check")+',lessonId:'+q(lid)+',questions:readingQuestions('+q(code)+','+q(level)+')})">Start reading questions</button>';
   } else {
     html+='<p>Listen to each sentence, repeat it aloud, then mark the unit practised. Playback uses your device speech synthesis where supported, and no score is invented for speaking.</p>';
-    lv.reading.passage.forEach(function(s){html+='<div class="word-row"><div style="flex:1" class="word-big">'+esc(s)+'</div><button class="btn btn-sm" type="button" onclick="speak('+JSON.stringify(s)+','+JSON.stringify(code)+')">Listen</button></div>';});
-    html+='<p>Repeat each sentence aloud, then tap below.</p><button class="btn btn-primary btn-block" type="button" onclick="completeSpeaking('+JSON.stringify(code)+','+JSON.stringify(lid)+')">I practised this unit</button>';
+    lv.reading.passage.forEach(function(s){html+='<div class="word-row"><div style="flex:1" class="word-big">'+esc(s)+'</div><button class="btn btn-sm" type="button" onclick="speak('+q(s)+','+q(code)+')">Listen</button></div>';});
+    html+='<p>Repeat each sentence aloud, then tap below.</p><button class="btn btn-primary btn-block" type="button" onclick="completeSpeaking('+q(code)+','+q(lid)+')">I practised this unit</button>';
   }
   openSheet(html,code);
 }
@@ -348,7 +349,7 @@ function openCert(certId){
   html+='<p>'+esc(cert[4])+'</p><p><strong>Skill areas:</strong> Listening, Reading, Writing, Speaking. <strong>Recommended level:</strong> '+cert[3]+' and above.</p>';
   html+='<p><strong>Mock exam structure:</strong> timed sections for each skill, with a vocabulary and grammar section first, then reading, listening, and a writing task. Your practice score here is tracked below.</p>';
   html+='<p><strong>Your practice progress:</strong> '+prog.correct+' of '+prog.total+' practice questions correct.</p>';
-  html+='<button class="btn btn-primary btn-block" type="button" onclick="startCertQuiz('+JSON.stringify(certId)+')">Start 5 practice questions</button>';
+  html+='<button class="btn btn-primary btn-block" type="button" onclick="startCertQuiz('+q(certId)+')">Start 5 practice questions</button>';
   openSheet(html,code);
 }
 function startCertQuiz(certId){
@@ -362,12 +363,12 @@ function startCertQuiz(certId){
 // ---- Tabs ----
 var TAB="home";
 function setTab(t){TAB=t;render();}
-function tabBtn(t,ic,label){return '<button class="tab '+(TAB===t?'on':'')+'" type="button" onclick="setTab('+JSON.stringify(t)+')">'+icon(ic)+'<span>'+label+'</span></button>';}
+function tabBtn(t,ic,label){return '<button class="tab '+(TAB===t?'on':'')+'" type="button" onclick="setTab('+q(t)+')">'+icon(ic)+'<span>'+label+'</span></button>';}
 function renderTabs(){document.getElementById("tabs").innerHTML=tabBtn("home","home","Home")+tabBtn("learn","book","Learn")+tabBtn("practice","target","Practice")+tabBtn("progress","chart","Progress")+tabBtn("profile","user","Profile");}
 function langCard(code){
   var L=LANG_DB[code];var cur=currentLesson(code);var pct=progressPct(code);
   var curText=cur.lesson?cur.lesson.title:(cur.exam?currentLevel(code)+" Level Exam":"Complete");
-  return '<button class="card" style="width:100%;text-align:left;color:var(--ink)" type="button" onclick="openLang('+JSON.stringify(code)+')"><div style="display:flex;gap:12px;align-items:center"><div style="flex:1;min-width:0"><div style="font-size:18px;font-weight:700">'+esc(L.name)+'</div><div class="kbd">'+esc(L.native)+' · '+currentLevel(code)+' '+LEVEL_NAMES[currentLevel(code)]+'</div><div style="margin:8px 0" class="progress-track"><div class="progress-fill" style="width:'+pct+'%"></div></div><div class="kbd">'+pct+'% complete · Next: '+esc(curText)+'</div></div>'+ring(pct)+'</div></button>';
+  return '<button class="card" style="width:100%;text-align:left;color:var(--ink)" type="button" onclick="openLang('+q(code)+')"><div style="display:flex;gap:12px;align-items:center"><div style="flex:1;min-width:0"><div style="font-size:18px;font-weight:700">'+esc(L.name)+'</div><div class="kbd">'+esc(L.native)+' · '+currentLevel(code)+' '+LEVEL_NAMES[currentLevel(code)]+'</div><div style="margin:8px 0" class="progress-track"><div class="progress-fill" style="width:'+pct+'%"></div></div><div class="kbd">'+pct+'% complete · Next: '+esc(curText)+'</div></div>'+ring(pct)+'</div></button>';
 }
 function renderHome(){
   if(!S.name)return renderOnboarding();
@@ -375,7 +376,7 @@ function renderHome(){
   var todaySecs=langState(curLang).activity[todayStr()]||0;
   var goalMin=S.prefs.dailyGoalMin||20;var dailyPct=Math.min(100,Math.round(todaySecs/60/goalMin*100));
   var html='<h2>Good day, '+esc(S.name)+'</h2><p>Continue where you left off, and keep your streak going.</p>';
-  html+='<div class="grid grid2"><div class="card"><div class="kbd">Continue Learning</div><h3 style="margin:6px 0">'+esc(LANG_DB[curLang].name)+' · '+(cur.lesson?esc(cur.lesson.title):esc(currentLevel(curLang)+" Level Exam"))+'</h3><button class="btn btn-primary" type="button" onclick="'+(cur.lesson?'openLesson('+JSON.stringify(curLang)+','+JSON.stringify(cur.level)+','+(parseInt(cur.lesson.id.split("-L")[1])-1)+')':'openLevelExam('+JSON.stringify(curLang)+','+JSON.stringify(cur.level)+')')+'">Continue</button></div>';
+  html+='<div class="grid grid2"><div class="card"><div class="kbd">Continue Learning</div><h3 style="margin:6px 0">'+esc(LANG_DB[curLang].name)+' · '+(cur.lesson?esc(cur.lesson.title):esc(currentLevel(curLang)+" Level Exam"))+'</h3><button class="btn btn-primary" type="button" onclick="'+(cur.lesson?'openLesson('+q(curLang)+','+q(cur.level)+','+(parseInt(cur.lesson.id.split("-L")[1])-1)+')':'openLevelExam('+q(curLang)+','+q(cur.level)+')')+'">Continue</button></div>';
   html+='<div class="card"><div class="kbd">Learning streak</div><h3 style="margin:6px 0">'+(langState(curLang).streak||0)+' days</h3><p style="margin:0">Daily goal: '+goalMin+' minutes · Today: '+Math.round(todaySecs/60)+' minutes ('+dailyPct+'%)</p><div class="progress-track" style="margin-top:10px"><div class="progress-fill" style="width:'+dailyPct+'%"></div></div></div></div>';
   html+='<h3>Recently studied languages</h3><div class="grid grid2">'+(S.recentLangs.length?S.recentLangs.map(function(c){return langCard(c);}).join(""):'<p>No study yet. Open Learn and start your first lesson.</p>')+'</div>';
   html+='<h3>Weekly activity</h3><div class="card"><div class="bar">'+last7Days().map(function(d){var secs=0;Object.keys(S.langs).forEach(function(c){secs+=S.langs[c].activity[d]||0;});var mins=Math.round(secs/60);return '<i style="height:'+Math.max(6,Math.min(72,mins*3))+'px" title="'+d+': '+mins+' min"></i>';}).join("")+'</div><div style="display:flex;justify-content:space-between" class="kbd">'+last7Days().map(function(d){return '<span>'+d.slice(5)+'</span>';}).join("")+'</div></div>';
@@ -392,7 +393,7 @@ function renderWelcome(){
 }
 function renderLearn(){
   var html='<h2>Learn</h2><p>Your selected languages. Progress is tracked separately for each language.</p><div class="grid grid2">'+S.selected.map(function(c){return langCard(c);}).join("")+'</div>';
-  html+='<h3>Add a language</h3><div style="display:flex;flex-wrap:wrap;gap:8px">'+Object.keys(LANG_DB).filter(function(c){return S.selected.indexOf(c)<0;}).map(function(c){return '<button class="btn btn-sm" type="button" onclick="addLang('+JSON.stringify(c)+')">+ '+esc(LANG_DB[c].name)+'</button>';}).join("")+'</div>';
+  html+='<h3>Add a language</h3><div style="display:flex;flex-wrap:wrap;gap:8px">'+Object.keys(LANG_DB).filter(function(c){return S.selected.indexOf(c)<0;}).map(function(c){return '<button class="btn btn-sm" type="button" onclick="addLang('+q(c)+')">+ '+esc(LANG_DB[c].name)+'</button>';}).join("")+'</div>';
   return html;
 }
 function addLang(c){S.selected.push(c);S.currentLang=c;save();render();toast(LANG_DB[c].name+" added");}
@@ -401,7 +402,7 @@ function openLang(code){
   var L=LANG_DB[code];var cur=currentLesson(code);
   var html='<button class="btn btn-sm" type="button" onclick="setTab(\'learn\')">← All languages</button>';
   html+='<h2>'+esc(L.name)+'</h2><p>'+esc(L.native)+' · Current level: '+currentLevel(code)+' '+LEVEL_NAMES[currentLevel(code)]+' · '+progressPct(code)+'% complete</p>';
-  html+='<div class="card"><div class="kbd">Continue Learning</div><h3 style="margin:6px 0">'+(cur.lesson?esc(cur.lesson.title):esc(currentLevel(code)+" Level Exam"))+'</h3><button class="btn btn-primary" type="button" onclick="'+(cur.lesson?'openLesson('+JSON.stringify(code)+','+JSON.stringify(cur.level)+','+(parseInt(cur.lesson.id.split("-L")[1])-1)+')':'openLevelExam('+JSON.stringify(code)+','+JSON.stringify(cur.level)+')')+'">Continue</button></div>';
+  html+='<div class="card"><div class="kbd">Continue Learning</div><h3 style="margin:6px 0">'+(cur.lesson?esc(cur.lesson.title):esc(currentLevel(code)+" Level Exam"))+'</h3><button class="btn btn-primary" type="button" onclick="'+(cur.lesson?'openLesson('+q(code)+','+q(cur.level)+','+(parseInt(cur.lesson.id.split("-L")[1])-1)+')':'openLevelExam('+q(code)+','+q(cur.level)+')')+'">Continue</button></div>';
   html+='<h3>Learning Path</h3>';
   LEVEL_ORDER.forEach(function(lv){
     var locked=!levelUnlocked(code,lv);
@@ -409,9 +410,9 @@ function openLang(code){
     allLessons(code,lv).forEach(function(l,idx){
       var done=langState(code).doneLessons.indexOf(l.id)>=0;
       var un=lessonUnlocked(code,lv,idx);
-      html+='<button class="lesson-row" '+(un?'':'disabled')+' type="button" onclick="openLesson('+JSON.stringify(code)+','+JSON.stringify(lv)+','+idx+')"><span>'+(done?icon("check"):un?icon("play"):icon("lock"))+'</span><span class="t"><b>'+esc(l.title)+'</b><span>'+esc(l.kindLabel)+(done?' · Completed':un?' · Ready':' · Locked')+'</span></span></button>';
+      html+='<button class="lesson-row" '+(un?'':'disabled')+' type="button" onclick="openLesson('+q(code)+','+q(lv)+','+idx+')"><span>'+(done?icon("check"):un?icon("play"):icon("lock"))+'</span><span class="t"><b>'+esc(l.title)+'</b><span>'+esc(l.kindLabel)+(done?' · Completed':un?' · Ready':' · Locked')+'</span></span></button>';
     });
-    html+='<button class="btn btn-block" style="margin-top:10px" type="button" onclick="openLevelExam('+JSON.stringify(code)+','+JSON.stringify(lv)+')">'+lv+' Level Exam (10 questions, pass 70%)</button></details>';
+    html+='<button class="btn btn-block" style="margin-top:10px" type="button" onclick="openLevelExam('+q(code)+','+q(lv)+')">'+lv+' Level Exam (10 questions, pass 70%)</button></details>';
   });
   html+='<h3>Vocabulary</h3>';
   LEVEL_ORDER.forEach(function(lv){html+='<details><summary>'+lv+' vocabulary, '+levelData(code,lv).vocab.length+' words</summary>'+levelData(code,lv).vocab.map(function(w){return wordCard(code,w);}).join("")+'</details>';});
@@ -419,16 +420,16 @@ function openLang(code){
   LEVEL_ORDER.forEach(function(lv){html+='<details><summary>'+lv+' grammar</summary>'+levelData(code,lv).grammar.map(function(g){return '<h4>'+esc(g.title)+'</h4><p>'+esc(g.body)+'</p>';}).join("")+'</details>';});
   html+='<h3>Pronunciation</h3><div class="card"><p>'+esc(L.scriptNote)+'</p><p>Tap Listen on any word to hear it with your device speech synthesis where supported.</p></div>';
   html+='<h3>Listening and Speaking</h3><p>Open any Listening and Speaking lesson in the path to practise with playback and repeat prompts.</p>';
-  html+='<h3>Tests</h3><div style="display:flex;flex-wrap:wrap;gap:8px"><button class="btn btn-sm" type="button" onclick="startQuiz({code:'+JSON.stringify(code)+',level:'+JSON.stringify(currentLevel(code))+',title:\'Quick Quiz\',questions:vocabQuestions('+JSON.stringify(code)+','+JSON.stringify(currentLevel(code))+',5,[\'Vocabulary\'])})">Quick Quiz</button><button class="btn btn-sm" type="button" onclick="startQuiz({code:'+JSON.stringify(code)+',level:'+JSON.stringify(currentLevel(code))+',title:\'Vocabulary Test\',questions:vocabQuestions('+JSON.stringify(code)+','+JSON.stringify(currentLevel(code))+',10,[\'Vocabulary\'])})">Vocabulary Test</button><button class="btn btn-sm" type="button" onclick="startQuiz({code:'+JSON.stringify(code)+',level:'+JSON.stringify(currentLevel(code))+',title:\'Writing Test\',questions:writingQuestions('+JSON.stringify(code)+','+JSON.stringify(currentLevel(code))+',5)})">Writing Test</button></div>';
+  html+='<h3>Tests</h3><div style="display:flex;flex-wrap:wrap;gap:8px"><button class="btn btn-sm" type="button" onclick="startQuiz({code:'+q(code)+',level:'+q(currentLevel(code))+',title:\'Quick Quiz\',questions:vocabQuestions('+q(code)+','+q(currentLevel(code))+',5,[\'Vocabulary\'])})">Quick Quiz</button><button class="btn btn-sm" type="button" onclick="startQuiz({code:'+q(code)+',level:'+q(currentLevel(code))+',title:\'Vocabulary Test\',questions:vocabQuestions('+q(code)+','+q(currentLevel(code))+',10,[\'Vocabulary\'])})">Vocabulary Test</button><button class="btn btn-sm" type="button" onclick="startQuiz({code:'+q(code)+',level:'+q(currentLevel(code))+',title:\'Writing Test\',questions:writingQuestions('+q(code)+','+q(currentLevel(code))+',5)})">Writing Test</button></div>';
   html+='<h3>Certification Preparation</h3><p class="note">Preparation only. NES:Learn does not issue these certifications and has no partnership with the exam bodies.</p>';
-  CERTS.filter(function(c){return c[2]===code;}).forEach(function(c){html+='<button class="card" style="width:100%;text-align:left;color:var(--ink);margin:8px 0" type="button" onclick="openCert('+JSON.stringify(c[0])+')"><b>'+esc(c[1])+'</b><p style="margin:4px 0 0">'+esc(c[4])+'</p></button>';});
+  CERTS.filter(function(c){return c[2]===code;}).forEach(function(c){html+='<button class="card" style="width:100%;text-align:left;color:var(--ink);margin:8px 0" type="button" onclick="openCert('+q(c[0])+')"><b>'+esc(c[1])+'</b><p style="margin:4px 0 0">'+esc(c[4])+'</p></button>';});
   if(!CERTS.filter(function(c){return c[2]===code;}).length)html+='<p>No exam body covers this language, so this language uses the structured proficiency pathway instead.</p>';
   document.getElementById("app").innerHTML=html;renderTabs();
 }
 function renderPractice(){
   var code=S.currentLang;var lv=currentLevel(code);
   var html='<h2>Practice</h2><p>Practising '+esc(LANG_DB[code].name)+' · Level '+lv+'</p>';
-  html+='<label>Practice language</label><div style="display:flex;flex-wrap:wrap;gap:8px">'+S.selected.map(function(c){return '<button class="btn btn-sm" type="button" onclick="S.currentLang='+JSON.stringify(c)+';save();render()">'+esc(LANG_DB[c].name)+(c===code?' ✓':'')+'</button>';}).join("")+'</div>';
+  html+='<label>Practice language</label><div style="display:flex;flex-wrap:wrap;gap:8px">'+S.selected.map(function(c){return '<button class="btn btn-sm" type="button" onclick="S.currentLang='+q(c)+';save();render()">'+esc(LANG_DB[c].name)+(c===code?' ✓':'')+'</button>';}).join("")+'</div>';
   var btn=function(t,fn){return '<button class="card" style="width:100%;text-align:left;color:var(--ink)" type="button" onclick="'+fn+'"><b>'+t+'</b></button>';};
   html+='<div class="grid grid2" style="margin-top:14px">';
   html+=btn("Vocabulary practice","startQuiz({code:'"+code+"',level:'"+lv+"',title:'Vocabulary Practice',questions:vocabQuestions('"+code+"','"+lv+"',8,['Vocabulary'])})");
@@ -466,7 +467,7 @@ function renderProgress(){
 }
 function renderProfile(){
   var html='<h2>Profile</h2><div class="card"><label for="nameEdit">Your name</label><input class="input" id="nameEdit" value="'+esc(S.name)+'"><button class="btn btn-primary" style="margin-top:10px" type="button" onclick="S.name=document.getElementById(\'nameEdit\').value.trim()||S.name;save();toast(\'Name saved\');render()">Save name</button></div>';
-  html+='<h3>Selected languages</h3><div class="card">'+Object.keys(LANG_DB).map(function(c){var on=S.selected.indexOf(c)>=0;return '<label style="display:flex;gap:10px;align-items:center"><input type="checkbox" '+(on?'checked':'')+' onchange="toggleLang('+JSON.stringify(c)+',this.checked)"> '+esc(LANG_DB[c].name)+'</label>';}).join("")+'<p class="note">At least one language must stay selected.</p></div>';
+  html+='<h3>Selected languages</h3><div class="card">'+Object.keys(LANG_DB).map(function(c){var on=S.selected.indexOf(c)>=0;return '<label style="display:flex;gap:10px;align-items:center"><input type="checkbox" '+(on?'checked':'')+' onchange="toggleLang('+q(c)+',this.checked)"> '+esc(LANG_DB[c].name)+'</label>';}).join("")+'<p class="note">At least one language must stay selected.</p></div>';
   html+='<h3>Preferences</h3><div class="card"><label>Theme</label><select class="input" id="themeSel" onchange="S.prefs.theme=this.value;save();render()"><option value="light" '+(S.prefs.theme==="light"?'selected':'')+'>Light</option><option value="dark" '+(S.prefs.theme==="dark"?'selected':'')+'>Dark</option></select><label>Daily goal (minutes)</label><input class="input" type="number" min="5" max="180" id="goalIn" value="'+(S.prefs.dailyGoalMin||20)+'"><button class="btn" style="margin-top:10px" type="button" onclick="S.prefs.dailyGoalMin=parseInt(document.getElementById(\'goalIn\').value)||20;save();render()">Save goal</button><label style="display:flex;gap:10px;align-items:center"><input type="checkbox" '+(S.prefs.voice?'checked':'')+' onchange="S.prefs.voice=this.checked;save()"> Spoken playback where supported</label></div>';
   html+='<h3>Local data controls</h3><div class="card" style="display:flex;flex-wrap:wrap;gap:8px"><button class="btn" type="button" onclick="exportData()">Export data as JSON</button><label class="btn" style="cursor:pointer">Import JSON<input type="file" accept=".json,application/json" style="display:none" onchange="importData(this)"></label><button class="btn" type="button" onclick="if(confirm(\'Clear all NES:Learn data on this device? This cannot be undone.\')){localStorage.removeItem(LS_KEY);location.reload();}">Clear all local data</button></div>';
   return html;
