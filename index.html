@@ -869,6 +869,7 @@ function renderHome(){
   var html='<h2>Good day, '+esc(S.name)+'</h2><p>Continue where you left off, and keep your streak going.</p>';
   html+='<div class="grid grid2"><div class="card"><div class="kbd">Continue Learning</div><h3 style="margin:6px 0">'+esc(LANG_DB[curLang].name)+' · '+(cur.lesson?esc(cur.lesson.title):esc(currentLevel(curLang)+" Level Exam"))+'</h3><button class="btn btn-primary" type="button" onclick="'+(cur.lesson?'openLesson('+q(curLang)+','+q(cur.level)+','+(parseInt(cur.lesson.id.split("-L")[1])-1)+')':'openLevelExam('+q(curLang)+','+q(cur.level)+')')+'">Continue</button></div>';
   html+='<div class="card"><div class="kbd">Learning streak</div><h3 style="margin:6px 0">'+streakFire(langState(curLang).streak||0)+(langState(curLang).streak||0)+' days</h3><p style="margin:0">Daily goal: '+goalMin+' minutes · Today: '+Math.round(todaySecs/60)+' minutes ('+dailyPct+'%)</p><div class="progress-track" style="margin-top:10px"><div class="progress-fill" style="width:'+dailyPct+'%"></div></div></div></div>';
+  html+='<div class="card" style="margin-top:14px"><div class="kbd">Dictionary</div><h3 style="margin:6px 0">Look up a word</h3><p style="margin:0 0 10px">Search the dictionary in any of the 8 languages. Free, no energy cost.</p><button class="btn" type="button" onclick="openDictionary()">Open dictionary</button></div>';
   html+='<h3>Your plan for today</h3>'+planCard(curLang);
   html+='<h3>Recently studied languages</h3><div class="grid grid2">'+(S.recentLangs.length?S.recentLangs.map(function(c){return langCard(c);}).join(""):'<p>No study yet. Open Learn and start your first lesson.</p>')+'</div>';
   html+='<h3>Weekly activity</h3><div class="card"><div class="bar">'+last7Days().map(function(d){var secs=0;Object.keys(S.langs).forEach(function(c){secs+=S.langs[c].activity[d]||0;});var mins=Math.round(secs/60);return '<i style="height:'+Math.max(6,Math.min(72,mins*3))+'px" title="'+d+': '+mins+' min"></i>';}).join("")+'</div><div style="display:flex;justify-content:space-between" class="kbd">'+last7Days().map(function(d){return '<span>'+d.slice(5)+'</span>';}).join("")+'</div></div>';
@@ -885,6 +886,7 @@ function renderWelcome(){
 }
 function renderLearn(){
   var html='<h2>Learn</h2><p>Your selected languages. Progress is tracked separately for each language.</p><div class="grid grid2">'+S.selected.map(function(c){return langCard(c);}).join("")+'</div>';
+  html+='<div class="card" style="margin-top:14px"><div class="kbd">Dictionary</div><h3 style="margin:6px 0">Look up words in any of the 8 languages</h3><p style="margin:0 0 10px">A growing dictionary, not a complete dictionary of any language. Dictionary use costs no energy.</p><button class="btn btn-primary" type="button" onclick="openDictionary()">Open dictionary</button></div>';
   html+='<h3>Add a language</h3><div style="display:flex;flex-wrap:wrap;gap:8px">'+Object.keys(LANG_DB).filter(function(c){return S.selected.indexOf(c)<0;}).map(function(c){return '<button class="btn btn-sm" type="button" onclick="addLang('+q(c)+')">+ '+esc(LANG_DB[c].name)+'</button>';}).join("")+'</div>';
   return html;
 }
@@ -1106,6 +1108,101 @@ setInterval(function(){regenEnergy();updateEnergyBadge();},30000);
 document.getElementById("readAcceptBtn").addEventListener("click",function(){S.accepted=true;save();hideReadFirst();});
 if(!S.accepted)showReadFirst();
 window.NESLearnTest={getState:function(){return S;},LANG_DB:LANG_DB,currentLesson:currentLesson,progressPct:progressPct,levelUnlocked:levelUnlocked,ALPHABETS:ALPHABETS,orderKey:orderKey};
+
+// ---- Dictionary: lazy-loaded per language, no energy cost ----
+var DICT_CACHE={};
+var DICT_STATE={code:"en",query:"",entries:[],list:[],status:""};
+function dictGloss(e){if(e.gloss)return e.gloss;if(e.meanings&&e.meanings.length)return e.meanings[0];return "";}
+function dictFilter(){
+  var q=DICT_STATE.query.trim().toLowerCase();
+  if(!q)return DICT_STATE.entries.slice();
+  return DICT_STATE.entries.filter(function(e){
+    var hay=(e.w+" "+dictGloss(e)+" "+(e.meanings?e.meanings.join(" "):"")+" "+(e.k||"")).toLowerCase();
+    return hay.indexOf(q)>=0;
+  });
+}
+function dictBodyHtml(){
+  var code=DICT_STATE.code;
+  if(DICT_STATE.status==="loading")return '<p>Loading the '+esc(LANG_DB[code].name)+' dictionary...</p>';
+  if(DICT_STATE.status==="error")return '<p class="note">Dictionary data could not be loaded. Check your connection and try again. Your lessons, energy, and plan are unaffected.</p><button class="btn" type="button" onclick="loadDict('+q(code)+')">Try again</button>';
+  if(!DICT_STATE.entries.length)return '<p>No dictionary entries loaded yet.</p>';
+  DICT_STATE.list=dictFilter();
+  var list=DICT_STATE.list;
+  var head=DICT_STATE.query?('<p>'+list.length+' match'+(list.length===1?'':'es')+' for "'+esc(DICT_STATE.query)+'"</p>'):('<p>Showing the first 50 of '+DICT_STATE.entries.length+' words. Type to search the full list.</p>');
+  if(!list.length)return head+'<p>No matches. Try another spelling.</p>';
+  var rows=list.slice(0,50).map(function(e,i){
+    return '<button class="lesson-row" type="button" onclick="dictShow('+i+')"><div class="t"><b>'+esc(e.w)+'</b><span>'+esc(dictGloss(e))+'</span></div></button>';
+  }).join("");
+  return head+'<div style="display:grid;gap:8px">'+rows+'</div>';
+}
+function dictSheetHtml(){
+  var code=DICT_STATE.code;
+  var picker=Object.keys(LANG_DB).map(function(c){
+    return '<button class="btn btn-sm" type="button" onclick="openDictionary('+q(c)+')"'+(c===code?' style="border-color:var(--brand)"':'')+'>'+esc(LANG_DB[c].name)+'</button>';
+  }).join("");
+  return sheetHead("Dictionary: "+LANG_DB[code].name,"A growing dictionary, not a complete dictionary of any language. Curriculum words come from NES:Learn lessons. Imported words credit their source on each entry.")
+    +'<div style="display:flex;flex-wrap:wrap;gap:8px;margin:12px 0">'+picker+'</div>'
+    +'<label for="dictSearch">Search in '+esc(LANG_DB[code].name)+'</label>'
+    +'<input class="input" id="dictSearch" placeholder="Type a word" value="'+esc(DICT_STATE.query)+'" oninput="dictSearch(this.value)">'
+    +'<div id="dictBody" style="margin-top:12px">'+dictBodyHtml()+'</div>';
+}
+function dictRenderBody(){
+  var el=document.getElementById("dictBody");
+  if(el)el.innerHTML=dictBodyHtml();
+}
+function loadDict(code){
+  DICT_STATE.code=code;
+  if(DICT_CACHE[code]){
+    DICT_STATE.entries=DICT_CACHE[code];
+    DICT_STATE.status="ok";
+    dictRenderBody();
+    return;
+  }
+  DICT_STATE.status="loading";
+  DICT_STATE.entries=[];
+  dictRenderBody();
+  fetch("dict/"+code+".json").then(function(r){
+    if(!r.ok)throw new Error("HTTP "+r.status);
+    return r.json();
+  }).then(function(data){
+    DICT_CACHE[code]=data.entries||[];
+    DICT_STATE.entries=DICT_CACHE[code];
+    DICT_STATE.status="ok";
+    dictRenderBody();
+  }).catch(function(){
+    DICT_STATE.status="error";
+    dictRenderBody();
+  });
+}
+function openDictionary(code){
+  DICT_STATE.code=code||S.currentLang||"en";
+  openSheet(dictSheetHtml(),DICT_STATE.code);
+  loadDict(DICT_STATE.code);
+}
+function dictSearch(v){
+  DICT_STATE.query=v;
+  dictRenderBody();
+}
+function dictShow(i){
+  var code=DICT_STATE.code;
+  var e=DICT_STATE.list[i];
+  if(!e)return;
+  var html="";
+  if(e.cur){
+    var w=findWord(code,e.id);
+    if(w){
+      html=sheetHead(e.w,"From your NES:Learn lessons")+wordCard(code,w)+'<p class="note">Source: NES:Learn curriculum. Phonetic spelling, part of speech, and examples come from your lessons.</p>';
+    }
+  }
+  if(!html){
+    html=sheetHead(e.w,dictGloss(e));
+    if(e.pos)html+='<p><b>Part of speech:</b> '+esc(e.pos)+'</p>';
+    if(e.meanings&&e.meanings.length)html+='<p><b>Meanings:</b></p><ul>'+e.meanings.map(function(m){return '<li>'+esc(m)+'</li>';}).join("")+'</ul>';
+    html+='<p class="note">Source: '+esc(e.src||"NES:Learn curriculum")+' · License: '+esc(e.lic||"App curriculum data")+'</p>';
+  }
+  html+='<button class="btn btn-block" style="margin-top:14px" type="button" onclick="openDictionary('+q(code)+')">Back to dictionary</button>';
+  openSheet(html,code);
+}
 
 </script>
 </body>
