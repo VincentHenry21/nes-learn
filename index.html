@@ -124,6 +124,14 @@ details summary{font-weight:700;cursor:pointer;font-size:15px}
 .road-node:disabled{cursor:not-allowed}
 .road-node:active:not(:disabled){transform:scale(.94)}
 .road-label{margin-top:6px;font-size:12px;font-weight:600;text-align:center;max-width:200px;color:var(--ink2)}
+.road-level{position:relative;margin:6px 0 16px}
+.road-svg{position:absolute;left:0;top:0;width:100%;height:100%}
+.road-abs{position:absolute;z-index:1}
+.road-node.current{animation:roadPulse 2s ease-in-out infinite}
+@keyframes roadPulse{0%,100%{box-shadow:0 0 0 6px color-mix(in srgb,var(--brand) 25%,transparent)}50%{box-shadow:0 0 0 11px color-mix(in srgb,var(--brand) 12%,transparent)}}
+.road-start{position:absolute;transform:translateX(-50%);background:var(--brand);color:#fff;font-size:11px;font-weight:800;padding:3px 10px;border-radius:999px;z-index:2;white-space:nowrap}
+.road-due{position:absolute;top:-8px;right:-8px;background:#E5484D;color:#fff;font-size:10px;font-weight:800;padding:2px 7px;border-radius:999px;z-index:2}
+.road-nodelabel{position:absolute;transform:translateX(-50%);width:150px;text-align:center;font-size:12px;font-weight:600;color:var(--ink2);z-index:1;line-height:1.3}
 @media (prefers-reduced-motion:reduce){*,*:before,*:after{animation:none!important;transition:none!important}}
 </style>
 </head>
@@ -162,9 +170,11 @@ function esc(s){return String(s).replace(/&/g,"&amp;").replace(/</g,"&lt;").repl
 function q(s){return "'"+String(s).replace(/'/g,"\\'")+"'";}
 function todayStr(d){d=d||new Date();return d.getFullYear()+"-"+String(d.getMonth()+1).padStart(2,"0")+"-"+String(d.getDate()).padStart(2,"0");}
 function yesterdayStr(){var d=new Date();d.setDate(d.getDate()-1);return todayStr(d);}
-function blankLang(){return {doneLessons:[],examPass:{},examScores:{},testHistory:[],savedWords:[],learnedWords:[],studySeconds:0,lastStudyDate:"",streak:0,activity:{},cert:{},alphaCompleted:0};}
-function defaultState(){var s={v:1,name:"",selected:["en","my"],currentLang:"en",prefs:{theme:"light",dailyGoalMin:20,voice:true},langs:{},recentLangs:[],accepted:false,energy:{v:10,max:10,t:0}};Object.keys(LANG_DB).forEach(function(c){s.langs[c]=blankLang();});return s;}
-function loadState(){try{var raw=localStorage.getItem(LS_KEY);if(!raw)return defaultState();var s=JSON.parse(raw);if(!s.langs)s.langs={};Object.keys(LANG_DB).forEach(function(c){if(!s.langs[c])s.langs[c]=blankLang();});if(!s.prefs)s.prefs={theme:"light",dailyGoalMin:20,voice:true};if(typeof s.accepted!=="boolean")s.accepted=false;if(!s.energy||typeof s.energy.v!=="number")s.energy={v:10,max:10,t:0};if(typeof s.energy.max!=="number")s.energy.max=10;if(typeof s.energy.t!=="number")s.energy.t=0;if(s.energy.v>s.energy.max)s.energy.v=s.energy.max;if(s.energy.v<0)s.energy.v=0;if(!s.selected||!s.selected.length)s.selected=["en"];return s;}catch(e){return defaultState();}}
+function blankLang(){return {doneLessons:[],examPass:{},examScores:{},testHistory:[],savedWords:[],learnedWords:[],studySeconds:0,lastStudyDate:"",streak:0,activity:{},cert:{},alphaCompleted:0,survey:null,diag:null,diagSkipped:false,placedLevel:null,mastery:null,reviews:{},wordReviews:{}};}
+function defaultState(){var s={v:1,name:"",selected:["en","my"],currentLang:"en",prefs:{theme:"light",dailyGoalMin:20,voice:true},langs:{},recentLangs:[],accepted:false,energy:{v:10,max:10,t:0},surveyGlobal:{goal:"",minutes:20}};Object.keys(LANG_DB).forEach(function(c){s.langs[c]=blankLang();});return s;}
+// ADAPT_SKILLS must be defined before loadState runs, because loadState seeds mastery for older saves.
+var ADAPT_SKILLS=["Vocabulary","Grammar","Reading","Listening","Speaking","Spelling"];
+function loadState(){try{var raw=localStorage.getItem(LS_KEY);if(!raw)return defaultState();var s=JSON.parse(raw);if(!s.langs)s.langs={};Object.keys(LANG_DB).forEach(function(c){if(!s.langs[c])s.langs[c]=blankLang();});if(!s.prefs)s.prefs={theme:"light",dailyGoalMin:20,voice:true};if(typeof s.accepted!=="boolean")s.accepted=false;if(!s.energy||typeof s.energy.v!=="number")s.energy={v:10,max:10,t:0};if(typeof s.energy.max!=="number")s.energy.max=10;if(typeof s.energy.t!=="number")s.energy.t=0;if(s.energy.v>s.energy.max)s.energy.v=s.energy.max;if(s.energy.v<0)s.energy.v=0;if(!s.selected||!s.selected.length)s.selected=["en"];if(!s.surveyGlobal)s.surveyGlobal={goal:"",minutes:20};Object.keys(LANG_DB).forEach(function(c){var st=s.langs[c];if(!st.mastery)st.mastery=defaultMastery();if(!st.reviews)st.reviews={};if(!st.wordReviews)st.wordReviews={};if(st.survey===undefined)st.survey=null;if(st.diag===undefined)st.diag=null;if(st.diagSkipped===undefined)st.diagSkipped=false;if(st.placedLevel===undefined)st.placedLevel=null;});return s;}catch(e){return defaultState();}}
 var S = loadState();
 function save(){localStorage.setItem(LS_KEY,JSON.stringify(S));applyTheme();}
 var ENERGY_MAX=10,ENERGY_MINUTES=6,ENERGY_MS=360000;
@@ -178,10 +188,10 @@ function langState(code){return S.langs[code];}
 function levelData(code,level){return LANG_DB[code].levels[level];}
 function lessonId(code,level,idx){return code+"-"+level+"-L"+(idx+1);}
 function lessonMeta(code,level,idx){
-  var kinds=[["vocab","Vocabulary 1"],["vocab","Vocabulary 2"],["grammar","Grammar 1"],["grammar","Grammar 2"],["grammar","Grammar 3"],["reading","Reading"],["listening","Listening and Speaking"]];
+  var kinds=[["vocab","Vocabulary 1"],["vocab","Vocabulary 2"],["grammar","Grammar 1"],["grammar","Grammar 2"],["grammar","Grammar 3"],["reading","Reading"],["listening","Listening and Speaking"],["alphabet","Alphabet study"],["phonics","Phonics game"],["order","Alphabetical Order game"],["spelling","Spelling practice 1"],["spelling","Spelling practice 2"],["grammar","Grammar drill 1"],["grammar","Grammar drill 2"],["vocabrev","Vocabulary review 1"],["vocabrev","Vocabulary review 2"],["listenprac","Listening practice"],["speakprac","Speaking practice"],["review","Full level review"],["challenge","Level challenge"]];
   var k=kinds[idx];return {id:lessonId(code,level,idx),kind:k[0],title:LEVEL_NAMES[level]+" Lesson "+(idx+1)+": "+k[1],kindLabel:k[1]};
 }
-function allLessons(code,level){var out=[];for(var i=0;i<7;i++)out.push(lessonMeta(code,level,i));return out;}
+function allLessons(code,level){var out=[];for(var i=0;i<20;i++)out.push(lessonMeta(code,level,i));return out;}
 function levelUnlocked(code,level){
   var i=LEVEL_ORDER.indexOf(level);if(i===0)return true;
   return !!langState(code).examPass[LEVEL_ORDER[i-1]];
@@ -200,7 +210,7 @@ function currentLesson(code){
   return {level:lv,lesson:null,exam:true};
 }
 function progressPct(code){
-  var done=0,total=0;LEVEL_ORDER.forEach(function(lv){total+=7;allLessons(code,lv).forEach(function(l){if(langState(code).doneLessons.indexOf(l.id)>=0)done++;});});
+  var done=0,total=0;LEVEL_ORDER.forEach(function(lv){total+=20;allLessons(code,lv).forEach(function(l){if(langState(code).doneLessons.indexOf(l.id)>=0)done++;});});
   return Math.round(done/total*100);
 }
 function markStudy(code,seconds){
@@ -306,6 +316,8 @@ function showResults(){
     var q=a.q;
     if(q.wordId&&a.correct&&st.learnedWords.indexOf(q.wordId)<0)st.learnedWords.push(q.wordId);
   });
+  QUIZ.answers.forEach(function(a){bktUpdate(QUIZ.code,a.q.skill,a.correct);if(a.q.wordId)sm2Word(QUIZ.code,a.q.wordId,a.correct);});
+  if(QUIZ.lessonId)sm2Lesson(QUIZ.code,QUIZ.lessonId,pct);
   if(QUIZ.lessonId&&st.doneLessons.indexOf(QUIZ.lessonId)<0)st.doneLessons.push(QUIZ.lessonId);
   if(QUIZ.examLevel){st.examScores[QUIZ.examLevel]=pct;if(pct>=70)st.examPass[QUIZ.examLevel]=true;}
   save();markStudy(QUIZ.code,60);
@@ -347,9 +359,9 @@ function vocabQuestions(code,level,n,skills,off){
   }
   return qs;
 }
-function writingQuestions(code,level,n){
+function writingQuestions(code,level,n,off){
   var v=levelData(code,level).vocab;var qs=[];
-  for(var i=0;i<n;i++){var w=v[(i*3)%v.length];qs.push({q:'Type the '+LANG_DB[code].name+' word for: '+w.gloss,options:[],answer:w.w,skill:"Spelling",write:true,wordId:w.id});}
+  for(var i=0;i<n;i++){var w=v[(i*3+(off||0))%v.length];qs.push({q:'Type the '+LANG_DB[code].name+' word for: '+w.gloss,options:[],answer:w.w,skill:"Spelling",write:true,wordId:w.id});}
   return qs;
 }
 
@@ -361,30 +373,12 @@ function wordCard(code,w){
 }
 function toggleSave(code,id){var st=langState(code);var i=st.savedWords.indexOf(id);if(i>=0)st.savedWords.splice(i,1);else st.savedWords.push(id);save();toast(i>=0?"Removed from saved words":"Saved word");render();}
 function openLesson(code,level,idx){
-  var meta=lessonMeta(code,level,idx);var lv=levelData(code,level);var lid=meta.id;
+  var meta=lessonMeta(code,level,idx);var lid=meta.id;
   if(!lessonUnlocked(code,level,idx)){toast("This lesson is locked. Complete the previous lesson first.");return;}
   if(!spendEnergy())return;
-  var html=sheetHead(meta.title,LANG_DB[code].name+" · "+level+" "+LEVEL_NAMES[level]);
-  if(meta.kind==="vocab"){
-    var words=idx===0?lv.vocab.slice(0,10):lv.vocab.slice(10,20);
-    html+='<p>Study these words, listen to each one, then take the spelling check to complete the lesson.</p>';
-    html+=words.map(function(w){return wordCard(code,w);}).join("");
-    html+='<button class="btn btn-primary btn-block" style="margin-top:12px" type="button" onclick="startQuiz({code:'+q(code)+',level:'+q(level)+',title:'+q(meta.title+" check")+',lessonId:'+q(lid)+',questions:writingQuestions('+q(code)+','+q(level)+',10)})">Start spelling check</button>';
-  } else if(meta.kind==="grammar"){
-    var g=lv.grammar[idx-2];
-    html+='<p>'+esc(g.body)+'</p><p class="note">Language focus: '+esc(LANG_DB[code].scriptNote)+'</p>';
-    html+='<button class="btn btn-primary btn-block" type="button" onclick="startQuiz({code:'+q(code)+',level:'+q(level)+',title:'+q(meta.title+" check")+',lessonId:'+q(lid)+',questions:vocabQuestions('+q(code)+','+q(level)+',6,[\'Grammar\'])})">Start grammar check</button>';
-  } else if(meta.kind==="reading"){
-    html+='<p>Read the passage, then answer the questions.</p><div class="card" style="box-shadow:none"><p style="color:var(--ink);font-size:17px">'+lv.reading.passage.map(function(s){return esc(s);}).join(" ")+'</p></div>';
-    html+='<button class="btn btn-primary btn-block" style="margin-top:12px" type="button" onclick="startQuiz({code:'+q(code)+',level:'+q(level)+',title:'+q(meta.title+" check")+',lessonId:'+q(lid)+',questions:readingQuestions('+q(code)+','+q(level)+')})">Start reading questions</button>';
-  } else {
-    html+='<p>Listen to each sentence, repeat it aloud, then mark the unit practised. Playback uses your device speech synthesis where supported, and no score is invented for speaking.</p>';
-    lv.reading.passage.forEach(function(s){html+='<div class="word-row"><div style="flex:1" class="word-big">'+esc(s)+'</div><button class="btn btn-sm" type="button" onclick="speak('+q(s)+','+q(code)+')">Listen</button></div>';});
-    html+='<p>Repeat each sentence aloud, then tap below.</p><button class="btn btn-primary btn-block" type="button" onclick="completeSpeaking('+q(code)+','+q(lid)+')">I practised this unit</button>';
-  }
-  openSheet(html,code);
+  startLessonPlayer(code,level,idx);
 }
-function completeSpeaking(code,lid){var st=langState(code);if(st.doneLessons.indexOf(lid)<0)st.doneLessons.push(lid);save();markStudy(code,120);closeSheet();toast("Listening and speaking unit complete");render();}
+function completeSpeaking(code,lid){var st=langState(code);if(st.doneLessons.indexOf(lid)<0)st.doneLessons.push(lid);sm2Lesson(code,lid,100);bktUpdate(code,"Listening",true);bktUpdate(code,"Speaking",true);save();markStudy(code,120);closeSheet();toast("Listening and speaking unit complete");render();}
 function readingQuestions(code,level){
   var lv=levelData(code,level);var v=lv.vocab;
   var themeOpts=pickOptions(LEVEL_THEMES[level],["greetings, numbers, family, and food","daily life, travel, and work","opinions, culture, and current topics","argumentation and professional life","academic and abstract topics","nuance, idiom, and register"],4);
@@ -404,7 +398,7 @@ function levelExamQuestions(code,level){
 function openLevelExam(code,level){
   var lv=levelData(code,level);
   var done=allLessons(code,level).every(function(l){return langState(code).doneLessons.indexOf(l.id)>=0;});
-  if(!done){toast("Complete all 7 lessons in this level first.");return;}
+  if(!done){toast("Complete all 20 lessons in this level first.");return;}
   if(!spendEnergy())return;
   startQuiz({code:code,level:level,title:level+" Level Exam",examLevel:level,questions:levelExamQuestions(code,level)});
 }
@@ -427,6 +421,333 @@ function startCertQuiz(certId){
     var st=langState(code);var p=st.cert[certId]||{correct:0,total:0};p.correct+=Math.round(pct/100*5);p.total+=5;st.cert[certId]=p;save();
   }});
 }
+// ---- On-device adaptive learning: survey, diagnostic, BKT mastery, SM-2 reviews, daily plan, lesson player ----
+// Honest scope, stated in the app as well: this is a simplified on-device adaptive plan, not a cloud model and
+// not a trained neural network. No data leaves the device. BKT parameters below are simplified defaults
+// (initial knowledge 0.3, learning 0.2, guessing 0.2, slipping 0.1), not values fitted to this app's data.
+// SM-2 review rule: first interval 1 day, second 6 days, later intervals multiply by the easiness factor
+// (starting at 2.5, minimum 1.3); a failed recall resets the interval to 1 day.
+var BKT={L0:0.3,T:0.2,G:0.2,S:0.1};
+
+function defaultMastery(){var m={};ADAPT_SKILLS.forEach(function(s){m[s]=0.3;});return m;}
+function masteryEnsure(code){var st=langState(code);if(!st.mastery)st.mastery=defaultMastery();ADAPT_SKILLS.forEach(function(s){if(typeof st.mastery[s]!=="number")st.mastery[s]=0.3;});return st.mastery;}
+function mapSkill(s){if(s==="Phonics")return "Listening";if(ADAPT_SKILLS.indexOf(s)>=0)return s;return null;}
+function bktUpdate(code,skill,correct){var sk=mapSkill(skill);if(!sk)return;var m=masteryEnsure(code);var p=m[sk];var post;if(correct)post=p*(1-BKT.S)/(p*(1-BKT.S)+(1-p)*BKT.G);else post=p*BKT.S/(p*BKT.S+(1-p)*(1-BKT.G));var p2=post+(1-post)*BKT.T;m[sk]=Math.max(0.05,Math.min(0.98,p2));}
+function addDaysStr(days){var d=new Date();d.setDate(d.getDate()+days);return todayStr(d);}
+function sm2Advance(e,success,pct){
+  if(!e.ef)e.ef=2.5;if(!e.reps)e.reps=0;if(!e.interval)e.interval=0;
+  var grade=success?(pct>=90?5:4):2;
+  if(grade>=4){e.reps++;e.interval=e.reps===1?1:(e.reps===2?6:Math.max(1,Math.round(e.interval*e.ef)));e.ef=Math.max(1.3,e.ef+(0.1-(5-grade)*(0.08+(5-grade)*0.02)));}
+  else{e.reps=0;e.interval=1;e.ef=Math.max(1.3,e.ef+(0.1-(5-grade)*(0.08+(5-grade)*0.02)));}
+  e.due=addDaysStr(e.interval);return e;
+}
+function sm2Lesson(code,lessonId,pct){var st=langState(code);if(!st.reviews)st.reviews={};var e=st.reviews[lessonId]||{ef:2.5,reps:0,interval:0,due:todayStr()};sm2Advance(e,pct>=70,pct);st.reviews[lessonId]=e;}
+function sm2Word(code,wordId,correct){var st=langState(code);if(!st.wordReviews)st.wordReviews={};var e=st.wordReviews[wordId]||{ef:2.5,reps:0,interval:0,due:todayStr()};sm2Advance(e,correct,correct?100:0);st.wordReviews[wordId]=e;}
+function findLessonById(code,id){var parts=id.split("-");var lv=parts[1];var idx=parseInt(parts[2].slice(1),10)-1;return {level:lv,idx:idx,meta:lessonMeta(code,lv,idx)};}
+function isDueLesson(code,id){var st=langState(code);if(!st.reviews||!st.reviews[id])return false;return st.reviews[id].due&&st.reviews[id].due<=todayStr()&&st.doneLessons.indexOf(id)>=0;}
+function dueLessons(code){var st=langState(code);var t=todayStr();var out=[];if(!st.reviews)return out;Object.keys(st.reviews).forEach(function(id){var e=st.reviews[id];if(e.due&&e.due<=t&&st.doneLessons.indexOf(id)>=0)out.push({id:id,due:e.due});});out.sort(function(a,b){return a.due<b.due?-1:(a.due>b.due?1:0);});return out;}
+function dueWords(code){var st=langState(code);var t=todayStr();var out=[];if(!st.wordReviews)return out;Object.keys(st.wordReviews).forEach(function(id){var e=st.wordReviews[id];if(e.due&&e.due<=t)out.push(id);});return out;}
+function dueWordQuestions(code){
+  var ids=dueWords(code).slice(0,10);var qs=[];
+  var glossPool=[];var wordPool=[];
+  Object.keys(LANG_DB[code].levels).forEach(function(lv){LANG_DB[code].levels[lv].vocab.forEach(function(w){glossPool.push(w.gloss);wordPool.push(w.w);});});
+  ids.forEach(function(id,i){var w=findWord(code,id);if(!w)return;
+    if(i%2===0)qs.push({q:'What does "'+w.w+'" mean?',options:pickOptions(w.gloss,glossPool,4),answer:w.gloss,skill:"Vocabulary",wordId:w.id});
+    else qs.push({q:'Which word means "'+w.gloss+'"?',options:pickOptions(w.w,wordPool,4),answer:w.w,skill:"Vocabulary",wordId:w.id});
+  });
+  return qs;
+}
+function weakestSkill(code){var m=masteryEnsure(code);var sk=ADAPT_SKILLS[0];var v=m[sk];ADAPT_SKILLS.forEach(function(s){if(m[s]<v){v=m[s];sk=s;}});return {skill:sk,value:v};}
+function skillPracticeFn(code,skill){
+  var lv=currentLevel(code);
+  if(skill==="Vocabulary")return "startQuiz({code:"+q(code)+",level:"+q(lv)+",title:'Weakest skill practice',questions:vocabQuestions("+q(code)+","+q(lv)+",5,['Vocabulary'])})";
+  if(skill==="Grammar")return "startQuiz({code:"+q(code)+",level:"+q(lv)+",title:'Weakest skill practice',questions:vocabQuestions("+q(code)+","+q(lv)+",5,['Grammar'])})";
+  if(skill==="Reading")return "startQuiz({code:"+q(code)+",level:"+q(lv)+",title:'Weakest skill practice',questions:readingQuestions("+q(code)+","+q(lv)+")})";
+  if(skill==="Listening")return "startListeningPractice()";
+  if(skill==="Spelling")return "startQuiz({code:"+q(code)+",level:"+q(lv)+",title:'Weakest skill practice',questions:writingQuestions("+q(code)+","+q(lv)+",5)})";
+  return "openLesson("+q(code)+","+q(lv)+",6)";
+}
+function buildPlan(code){
+  var items=[];var st=langState(code);
+  dueLessons(code).slice(0,3).forEach(function(d){var f=findLessonById(code,d.id);items.push({title:"Review: "+f.meta.title,reason:"Due for review",mins:5,fn:"startQuiz({code:"+q(code)+",level:"+q(f.level)+",title:"+q("Review: "+f.meta.title)+",questions:miniTestQuestions("+q(code)+","+q(f.level)+","+f.idx+")})"});});
+  var dw=dueWords(code);
+  if(dw.length>=4)items.push({title:"Review "+dw.length+" due words",reason:dw.length+" words due for review",mins:5,fn:"startQuiz({code:"+q(code)+",level:"+q(currentLevel(code))+",title:'Due word review',questions:dueWordQuestions("+q(code)+")})"});
+  var ws=weakestSkill(code);
+  if(ws.value<0.7){var spMins=ws.skill==="Speaking"?15:5;items.push({title:ws.skill+" practice",reason:"Your weakest skill right now: "+ws.skill+" ("+Math.round(ws.value*100)+"%)"+(ws.skill==="Speaking"?" (costs 1 energy, it opens a lesson)":""),mins:spMins,fn:skillPracticeFn(code,ws.skill)});}
+  var cur=currentLesson(code);
+  if(cur.lesson){var li=parseInt(cur.lesson.id.split("-L")[1],10)-1;items.push({title:cur.lesson.title,reason:"Next on your roadmap",mins:15,fn:"openLesson("+q(code)+","+q(cur.level)+","+li+")"});}
+  else if(cur.exam){items.push({title:cur.level+" Level Exam",reason:"Next on your roadmap",mins:15,fn:"openLevelExam("+q(code)+","+q(cur.level)+")"});}
+  var budget=(S.surveyGlobal&&S.surveyGlobal.minutes)||20;var out=[];var total=0;
+  items.forEach(function(it){if(total+it.mins<=budget){out.push(it);total+=it.mins;}});
+  if(!out.length&&items.length)out.push(items[0]);
+  return out;
+}
+function planCard(code){
+  var st=langState(code);var items=buildPlan(code);
+  var html='<div class="card"><div class="kbd">Your plan for today · On-device adaptive plan</div>';
+  var duesNow=dueLessons(code);var dwNow=dueWords(code);
+  if(duesNow.length||dwNow.length>=4){
+    html+='<p style="margin:8px 0"><b>Due reviews</b></p>';
+    duesNow.slice(0,3).forEach(function(d){var f=findLessonById(code,d.id);html+='<button class="btn btn-block" style="margin:6px 0;text-align:left" type="button" onclick="startQuiz({code:'+q(code)+',level:'+q(f.level)+',title:'+q("Review: "+f.meta.title)+',questions:miniTestQuestions('+q(code)+','+q(f.level)+','+f.idx+')})"><b>Review: '+esc(f.meta.title)+'</b><br><span class="kbd">Due for review · about 5 min</span></button>';});
+    if(dwNow.length>=4)html+='<button class="btn btn-block" style="margin:6px 0;text-align:left" type="button" onclick="startQuiz({code:'+q(code)+',level:'+q(currentLevel(code))+',title:'+q("Due word review")+',questions:dueWordQuestions('+q(code)+')})"><b>Review '+dwNow.length+' due words</b><br><span class="kbd">Due for review · about 5 min</span></button>';
+  }
+  if(!st.survey){html+='<p style="margin:6px 0">Take the starting survey so your plan fits your goal and time.</p><button class="btn btn-primary" type="button" onclick="openSurvey('+q(code)+')">Take the starting survey</button>';}
+  else if(!st.diag&&!st.diagSkipped){html+='<p style="margin:6px 0">Survey saved. Take the short placement test to set your starting level.</p><button class="btn btn-primary" type="button" onclick="startDiag('+q(code)+')">Take the placement test</button> <button class="btn" type="button" onclick="skipDiag('+q(code)+')">Start at A1 instead</button>';}
+  else if(!items.length){html+='<p>Nothing scheduled. Open your roadmap and pick a lesson.</p>';}
+  else{html+=items.map(function(it){return '<button class="btn btn-block" style="margin:6px 0;text-align:left" type="button" onclick="'+it.fn+'"><b>'+esc(it.title)+'</b><br><span class="kbd">'+esc(it.reason)+' · about '+it.mins+' min</span></button>';}).join("");}
+  html+='<p class="note" style="margin:8px 0 0">Each lesson has 15 units, 2 practices per unit, 30 practices, then a small test, about 15 minutes. Your plan fits your surveyed daily minutes and adapts to your answers on this device only. No data leaves your device.</p></div>';
+  return html;
+}
+function jumpToNode(id){var el=document.getElementById(id);if(el&&el.scrollIntoView)el.scrollIntoView({block:"center",behavior:"auto"});}
+// ---- Survey ----
+var SV_GOALS=["Travel","Work","School","Exam preparation","Fun"];
+var SV_MINUTES=[5,10,20,30];
+function openSurvey(code){
+  var st=langState(code);var sv=st.survey||{};var gm=(S.surveyGlobal&&S.surveyGlobal.goal)||"";var mm=(S.surveyGlobal&&S.surveyGlobal.minutes)||20;
+  var html=sheetHead("Starting survey: "+LANG_DB[code].name,"A short survey so your plan fits you. You can retake it anytime from Profile.");
+  html+='<p><b>What is your goal?</b></p>'+SV_GOALS.map(function(g){return '<label style="display:block;margin:6px 0"><input type="radio" name="svGoal" value="'+esc(g)+'" '+(gm===g?'checked':'')+'> '+esc(g)+'</label>';}).join("");
+  html+='<p><b>Daily minutes available?</b></p>'+SV_MINUTES.map(function(m){return '<label style="display:block;margin:6px 0"><input type="radio" name="svMin" value="'+m+'" '+(mm===m?'checked':'')+'> '+m+(m===30?' or more':'')+' minutes</label>';}).join("");
+  html+='<p><b>Prior experience with '+esc(LANG_DB[code].name)+'</b></p>'+["None","A little","Used before"].map(function(e){return '<label style="display:block;margin:6px 0"><input type="radio" name="svExp" value="'+esc(e)+'" '+(sv.experience===e?'checked':'')+'> '+esc(e)+'</label>';}).join("");
+  html+='<p><b>Your level, in your own words</b></p><select class="input" id="svLevel">'+LEVEL_ORDER.map(function(lv){return '<option value="'+lv+'" '+(sv.selfLevel===lv?'selected':'')+'>'+lv+' '+LEVEL_NAMES[lv]+'</option>';}).join("")+'</select>';
+  html+='<p><b>Focus skills (pick up to 2)</b></p>'+["Speaking","Listening","Reading","Writing","Vocabulary"].map(function(s){return '<label style="display:block;margin:6px 0"><input type="checkbox" name="svFocus" value="'+s+'" '+((sv.focus||[]).indexOf(s)>=0?'checked':'')+'> '+s+'</label>';}).join("");
+  html+='<button class="btn btn-primary btn-block" style="margin-top:14px" type="button" onclick="saveSurvey('+q(code)+')">Save survey</button>';
+  openSheet(html,code);
+}
+function saveSurvey(code){
+  var goal=document.querySelector('input[name="svGoal"]:checked');var min=document.querySelector('input[name="svMin"]:checked');var exp=document.querySelector('input[name="svExp"]:checked');
+  var focus=[];document.querySelectorAll('input[name="svFocus"]:checked').forEach(function(el){focus.push(el.value);});
+  if(!goal||!min||!exp){toast("Please answer the goal, minutes, and experience questions.");return;}
+  if(focus.length>2){toast("Pick up to 2 focus skills.");return;}
+  if(!S.surveyGlobal)S.surveyGlobal={};S.surveyGlobal.goal=goal.value;S.surveyGlobal.minutes=parseInt(min.value,10);
+  var st=langState(code);st.survey={experience:exp.value,selfLevel:document.getElementById("svLevel").value,focus:focus};
+  save();closeSheet();
+  var html=sheetHead("Survey saved","Your plan will use your goal and daily minutes.");
+  html+='<p>Next, take the short placement test to set your starting level, or start at A1.</p>';
+  html+='<button class="btn btn-primary btn-block" style="margin:6px 0" type="button" onclick="startDiag('+q(code)+')">Take the placement test</button>';
+  html+='<button class="btn btn-block" style="margin:6px 0" type="button" onclick="skipDiag('+q(code)+')">Start at A1 instead</button>';
+  openSheet(html,code);
+}
+function skipDiag(code){var st=langState(code);st.diagSkipped=true;save();closeSheet();toast("Starting at A1. You can take the placement test later from Profile.");render();}
+// ---- Diagnostic placement test (staircase) ----
+var DIAG=null;
+function diagQuestions(code,level){
+  var qs=vocabQuestions(code,level,1,["Vocabulary"],0);
+  qs=qs.concat(vocabQuestions(code,level,1,["Grammar"],5));
+  qs=qs.concat(readingQuestions(code,level).slice(0,1));
+  var v=levelData(code,level).vocab.slice(0,5);
+  qs.push({q:"Listen, then choose the meaning of the word you hear.",options:pickOptions(v[0].gloss,levelData(code,level).vocab.map(function(x){return x.gloss;}),4),answer:v[0].gloss,skill:"Listening",wordId:v[0].id,play:v[0].w});
+  return qs;
+}
+function startDiag(code){DIAG={code:code,li:0,qs:diagQuestions(code,"A1"),idx:0,correct:0,skill:{}};renderDiag();}
+function renderDiag(){
+  var d=DIAG;if(!d)return;var lv=LEVEL_ORDER[d.li];var qq=d.qs[d.idx];
+  var html=sheetHead("Placement test: "+LANG_DB[d.code].name,"Level "+lv+" · Question "+(d.idx+1)+" of 4 · Diagnostic estimate only, not a certificate.");
+  html+='<div class="progress-track" style="margin:14px 0"><div class="progress-fill" style="width:'+Math.round(d.idx/4*100)+'%"></div></div>';
+  html+='<p style="font-size:18px;font-weight:600">'+esc(qq.q)+'</p>';
+  if(qq.play)html+='<button class="btn btn-sm" type="button" onclick="speak('+q(qq.play)+','+q(d.code)+')">Listen</button>';
+  qq.options.forEach(function(o,i){html+='<button class="opt" type="button" onclick="diagAnswer('+i+')">'+esc(o)+'</button>';});
+  openSheet(html,d.code);
+}
+function diagAnswer(i){
+  var d=DIAG;if(!d)return;var qq=d.qs[d.idx];var ok=qq.options[i]===qq.answer;
+  if(ok)d.correct++;
+  if(!d.skill[qq.skill])d.skill[qq.skill]={c:0,t:0};d.skill[qq.skill].t++;if(ok)d.skill[qq.skill].c++;
+  d.idx++;
+  if(d.idx>=d.qs.length){
+    if(d.correct>=3&&d.li<LEVEL_ORDER.length-1){d.li++;d.qs=diagQuestions(d.code,LEVEL_ORDER[d.li]);d.idx=0;d.correct=0;renderDiag();}
+    else finishDiag();
+  } else renderDiag();
+}
+function finishDiag(){
+  var d=DIAG;var code=d.code;var last=LEVEL_ORDER.length-1;
+  var placed=(d.li===last&&d.correct>=3)?"C2":LEVEL_ORDER[d.li];
+  var st=langState(code);
+  var acc={};["Vocabulary","Grammar","Reading","Listening"].forEach(function(s){acc[s]=d.skill[s]?Math.round(d.skill[s].c/d.skill[s].t*100):null;});
+  st.diag={level:placed,skills:acc,date:todayStr()};st.diagSkipped=false;
+  var curPlacedIdx=st.placedLevel?LEVEL_ORDER.indexOf(st.placedLevel):-1;var newIdx=LEVEL_ORDER.indexOf(placed);
+  if(newIdx>curPlacedIdx){
+    st.placedLevel=placed;
+    for(var i=0;i<newIdx;i++){var lv2=LEVEL_ORDER[i];allLessons(code,lv2).forEach(function(l){if(st.doneLessons.indexOf(l.id)<0)st.doneLessons.push(l.id);});st.examPass[lv2]=true;}
+  }
+  var m=masteryEnsure(code);
+  function seed(skill,accVal,fallbackSkill){var a=accVal;if(a===null||a===undefined)a=acc[fallbackSkill];if(a===null||a===undefined)m[skill]=0.3;else m[skill]=Math.max(0.1,Math.min(0.95,0.25+0.6*(a/100)));}
+  seed("Vocabulary",acc["Vocabulary"]);seed("Grammar",acc["Grammar"]);seed("Reading",acc["Reading"]);seed("Listening",acc["Listening"]);seed("Spelling",null,"Vocabulary");seed("Speaking",null,"Listening");
+  save();
+  var scored=["Vocabulary","Grammar","Reading","Listening"].filter(function(s){return acc[s]!==null;});
+  var strong=scored.length?scored.slice().sort(function(a,b){return acc[b]-acc[a];})[0]:"not tested";
+  var weak=scored.length?scored.slice().sort(function(a,b){return acc[a]-acc[b];})[0]:"not tested";
+  var html=sheetHead("Placement result: "+LANG_DB[code].name,"Diagnostic estimate for placing lessons, not a certificate and not an official exam result.");
+  html+='<p><strong>Estimated starting level: '+placed+' '+LEVEL_NAMES[placed]+'</strong></p>';
+  html+='<p>Per-skill results: '+["Vocabulary","Grammar","Reading","Listening"].map(function(s){return s+" "+(acc[s]===null?"not tested":acc[s]+"%");}).join(" · ")+'</p>';
+  html+='<p>Strongest: '+strong+'; weakest: '+weak+'. Your plan will lean on '+weak+' first.</p>';
+  html+='<p>Lower levels are marked as placed (not studied) so your roadmap starts at '+placed+'. You can still open any earlier lesson to study it.</p>';
+  html+='<button class="btn btn-primary btn-block" type="button" onclick="closeSheet();openLang('+q(code)+')">See my plan</button>';
+  openSheet(html,code);
+  DIAG=null;
+}
+// ---- Lesson player: 15 units, 2 practices per unit, 30 practices, then a small test ----
+function wordStudy(code,w){return '<div class="word-row"><div style="flex:1;min-width:0"><div class="word-big">'+esc(w.w)+'</div><div class="word-gloss">'+esc(w.gloss)+'</div>'+(w.phon?'<div class="word-phon">Phonetic spelling: '+esc(w.phon)+'</div>':'')+'<div class="word-example">Example: '+esc(w.frame)+'</div></div><div><button class="btn btn-sm" type="button" onclick="playWord('+q(code)+','+q(w.id)+')">Listen</button><div class="voice-note">'+(w.audio?'Real voice':'Device voice')+'</div></div></div>';}
+function mcMeaning(w,pool,skill){return {type:"mc",q:'What does "'+w.w+'" mean?',options:pickOptions(w.gloss,pool,4),answer:w.gloss,skill:skill||"Vocabulary",wordId:w.id};}
+function mcWord(w,pool,skill){return {type:"mc",q:'Which word means "'+w.gloss+'"?',options:pickOptions(w.w,pool,4),answer:w.w,skill:skill||"Vocabulary",wordId:w.id};}
+function writePrac(code,w){return {type:"write",q:'Type the '+LANG_DB[code].name+' word for: '+w.gloss,answer:w.w,skill:"Spelling",wordId:w.id};}
+function listenPrac(w,pool){return {type:"mc",q:"Listen, then choose the meaning of the word you hear.",options:pickOptions(w.gloss,pool,4),answer:w.gloss,skill:"Listening",wordId:w.id,play:w.w};}
+function buildLessonUnits(code,level,idx){
+  var meta=lessonMeta(code,level,idx);var v=levelData(code,level).vocab;var glossPool=v.map(function(w){return w.gloss;});var wordPool=v.map(function(w){return w.w;});
+  var units=[];
+  function wordUnit(w,p1,p2){return {study:wordStudy(code,w),practices:[p1,p2]};}
+  function rot(arr,n){return arr.slice(n).concat(arr.slice(0,n));}
+  if(meta.kind==="vocab"){
+    var words=(idx===0?v.slice(0,10).concat(v.slice(10,15)):v.slice(10,20).concat(v.slice(0,5)));
+    words.forEach(function(w,i){units.push(wordUnit(w,i%2===0?mcMeaning(w,glossPool):mcWord(w,wordPool),i%2===0?writePrac(code,w):listenPrac(w,glossPool)));});
+  } else if(meta.kind==="spelling"){
+    var sw=rot(v,idx===10?0:5).slice(0,15);
+    sw.forEach(function(w){units.push(wordUnit(w,writePrac(code,w),mcWord(w,wordPool)));});
+  } else if(meta.kind==="vocabrev"){
+    var rw=shuffle(v.slice(),idx*7+3).slice(0,15);
+    rw.forEach(function(w,i){units.push(wordUnit(w,i%2===0?mcMeaning(w,glossPool):listenPrac(w,glossPool),mcWord(w,wordPool)));});
+  } else if(meta.kind==="grammar"){
+    var topics=levelData(code,level).grammar;
+    for(var u=0;u<15;u++){var tp=topics[u%topics.length];var w=v[(u*3+idx)%v.length];
+      units.push({study:'<h4>'+esc(tp.title)+'</h4><p>'+esc(tp.body)+'</p><p class="note">Language focus: '+esc(LANG_DB[code].scriptNote)+'</p>',practices:[mcMeaning(w,glossPool,"Grammar"),writePrac(code,w)]});}
+  } else if(meta.kind==="reading"){
+    var pas=levelData(code,level).reading.passage;
+    pas.forEach(function(s,si){var w=v[si%v.length];units.push({study:'<p style="font-size:17px">'+esc(s)+'</p><button class="btn btn-sm" type="button" onclick="speak('+q(s)+','+q(code)+')">Listen</button>',practices:[mcMeaning(w,glossPool,"Reading"),listenPrac(w,glossPool)]});});
+    v.slice(4,15).forEach(function(w){units.push(wordUnit(w,mcWord(w,wordPool),writePrac(code,w)));});
+  } else if(meta.kind==="listening"||meta.kind==="listenprac"||meta.kind==="speakprac"){
+    var pas2=levelData(code,level).reading.passage;
+    pas2.forEach(function(s,si){var w=v[si%v.length];units.push({study:'<p style="font-size:17px">'+esc(s)+'</p><button class="btn btn-sm" type="button" onclick="speak('+q(s)+','+q(code)+')">Listen</button>'+(meta.kind==="speakprac"?'<p>Repeat this sentence aloud.</p>':''),practices:[listenPrac(w,glossPool),mcMeaning(w,glossPool)]});});
+    var base=meta.kind==="listenprac"?rot(v,7):v;
+    base.slice(4,15).forEach(function(w){units.push({study:wordStudy(code,w)+'<button class="btn btn-sm" type="button" onclick="playWord('+q(code)+','+q(w.id)+')">Listen</button>',practices:[listenPrac(w,glossPool),mcWord(w,wordPool)]});});
+  } else if(meta.kind==="alphabet"||meta.kind==="phonics"){
+    var items=meta.kind==="alphabet"?ALPHABETS[code].items.slice(0,15):shuffle(ALPHABETS[code].items.slice(),8).slice(0,15);
+    var symPool=ALPHABETS[code].items.map(function(it){return it[0];});
+    items.forEach(function(it){
+      var study='<div style="text-align:center"><div style="font-size:34px;font-weight:700">'+esc(it[0])+'</div><div class="kbd">'+esc(it[1])+'</div><button class="btn btn-sm" type="button" onclick="speak('+q(alphaSound(code,it))+','+q(code)+')">Listen</button></div>';
+      units.push({study:study,practices:[
+        {type:"mc",q:"Listen, then choose the letter you hear.",options:pickOptions(it[0],symPool,4),answer:it[0],skill:"Phonics",play:alphaSound(code,it)},
+        {type:"mc",q:'Which letter is pronounced "'+it[1]+'"?',options:pickOptions(it[0],symPool,4),answer:it[0],skill:"Reading"}
+      ]});
+    });
+  } else if(meta.kind==="order"){
+    var ow=shuffle(v.slice(),9).slice(0,15);
+    ow.forEach(function(w,i){
+      var trio=[w,ow[(i+1)%15],ow[(i+2)%15]];
+      var sorted=trio.slice().sort(function(a,b){var ka=orderKey(code,a),kb=orderKey(code,b);return ka<kb?-1:(ka>kb?1:0);});
+      units.push(wordUnit(w,{type:"order",words:shuffle(trio.slice(),i*3+1),sorted:sorted,skill:"Vocabulary"},mcMeaning(w,glossPool)));
+    });
+  } else {
+    for(var u2=0;u2<15;u2++){
+      var w2=v[(u2*3+(idx===19?5:0))%v.length];
+      if(u2%3===0){var tp2=levelData(code,level).grammar[Math.floor(u2/3)%levelData(code,level).grammar.length];units.push({study:'<h4>'+esc(tp2.title)+'</h4><p>'+esc(tp2.body)+'</p>',practices:[mcMeaning(w2,glossPool,"Grammar"),writePrac(code,w2)]});}
+      else if(u2%3===1){units.push(wordUnit(w2,mcMeaning(w2,glossPool),listenPrac(w2,glossPool)));}
+      else{var s2=levelData(code,level).reading.passage[u2%4];units.push({study:'<p style="font-size:17px">'+esc(s2)+'</p>',practices:[mcWord(w2,wordPool),writePrac(code,w2)]});}
+    }
+  }
+  while(units.length<15){var w3=v[units.length%v.length];units.push(wordUnit(w3,mcMeaning(w3,glossPool),writePrac(code,w3)));}
+  return units.slice(0,15);
+}
+function alphabetCheckQuestions(code,n){
+  var items=shuffle(ALPHABETS[code].items.slice(),5).slice(0,n);var pool=ALPHABETS[code].items.map(function(it){return it[0];});
+  return items.map(function(it){return {q:'Which letter is pronounced "'+it[1]+'"?',options:pickOptions(it[0],pool,4),answer:it[0],skill:"Reading"};});
+}
+function listeningQuestions(code,level){
+  var v=levelData(code,level).vocab.slice(0,5);
+  return v.map(function(w){return {q:"Listen, then choose the meaning of the word you hear.",options:pickOptions(w.gloss,levelData(code,level).vocab.map(function(x){return x.gloss;}),4),answer:w.gloss,skill:"Listening",wordId:w.id,play:w.w};});
+}
+function levelChallengeQuestions(code,level){
+  var qs=vocabQuestions(code,level,4,["Vocabulary"],7);
+  qs=qs.concat(writingQuestions(code,level,2,2));
+  qs=qs.concat(readingQuestions(code,level).slice(0,2));
+  qs=qs.concat(vocabQuestions(code,level,2,["Grammar"],11));
+  return qs.slice(0,10);
+}
+function miniTestQuestions(code,level,idx){
+  var meta=lessonMeta(code,level,idx);
+  if(meta.kind==="alphabet"||meta.kind==="phonics")return alphabetCheckQuestions(code,5);
+  if(meta.kind==="challenge")return levelChallengeQuestions(code,level);
+  var qs=vocabQuestions(code,level,2,["Vocabulary"],idx);
+  qs=qs.concat(vocabQuestions(code,level,1,["Grammar"],idx+3));
+  qs=qs.concat(writingQuestions(code,level,1,idx));
+  qs=qs.concat(readingQuestions(code,level).slice(0,1));
+  return qs;
+}
+var LESSON_PLAYER=null;
+function startLessonPlayer(code,level,idx){
+  var meta=lessonMeta(code,level,idx);
+  LESSON_PLAYER={code:code,level:level,idx:idx,lid:meta.id,title:meta.title,kind:meta.kind,units:buildLessonUnits(code,level,idx),u:0,p:0,feedback:null,orderPlaced:null,orderRemaining:null,orderMsg:""};
+  var pr0=LESSON_PLAYER.units[0].practices[0];
+  if(pr0.type==="order"){LESSON_PLAYER.orderPlaced=[];LESSON_PLAYER.orderRemaining=pr0.words.slice();}
+  renderPlayer();
+}
+function renderPlayer(){
+  var lp=LESSON_PLAYER;if(!lp)return;
+  var unit=lp.units[lp.u];var pr=unit.practices[lp.p];
+  var html=sheetHead(lp.title,LANG_DB[lp.code].name+" · "+lp.level+" "+LEVEL_NAMES[lp.level]+" · Unit "+(lp.u+1)+" of 15 · Practice "+(lp.u*2+lp.p+1)+" of 30");
+  html+='<div class="progress-track" style="margin:14px 0"><div class="progress-fill" style="width:'+Math.round((lp.u*2+lp.p)/30*100)+'%"></div></div>';
+  html+='<div class="card" style="box-shadow:none">'+unit.study+'</div>';
+  if(lp.feedback){
+    html+='<p><b>'+(lp.feedback.ok?'Correct!':'Not quite.')+'</b>'+(lp.feedback.ok?'':' The answer is <strong>'+esc(lp.feedback.answer)+'</strong>.')+'</p>';
+    html+='<button class="btn btn-primary btn-block" type="button" onclick="playerNext()">Next</button>';
+  } else if(pr.type==="mc"){
+    html+='<p style="font-size:17px;font-weight:600">'+esc(pr.q)+'</p>';
+    if(pr.play)html+='<button class="btn btn-sm" type="button" onclick="speak('+q(pr.play)+','+q(lp.code)+')">Listen</button>';
+    pr.options.forEach(function(o,i){html+='<button class="opt" type="button" onclick="playerAnswer('+i+')">'+esc(o)+'</button>';});
+  } else if(pr.type==="write"){
+    html+='<p style="font-size:17px;font-weight:600">'+esc(pr.q)+'</p>';
+    html+='<label>Your answer</label><input class="input" id="playerWrite" placeholder="Type the word here"><button class="btn btn-primary btn-block" style="margin-top:10px" type="button" onclick="playerCheckWrite()">Check answer</button>';
+  } else if(pr.type==="order"){
+    html+='<p style="font-size:17px;font-weight:600">Tap these words in alphabetical order.</p>';
+    if(lp.orderMsg)html+='<p class="note">'+esc(lp.orderMsg)+'</p>';
+    html+='<p><strong>Placed so far:</strong> '+(lp.orderPlaced.length?lp.orderPlaced.map(function(w){return esc(w.w);}).join(" · "):"none yet")+'</p>';
+    lp.orderRemaining.forEach(function(w,i){html+='<button class="opt" type="button" onclick="playerOrderTap('+i+')">'+esc(w.w)+'</button>';});
+  }
+  html+='<button class="btn btn-block" style="margin-top:12px" type="button" onclick="closeSheet()">Leave lesson (not counted as done)</button>';
+  openSheet(html,lp.code);
+}
+function playerAnswer(i){
+  var lp=LESSON_PLAYER;var pr=lp.units[lp.u].practices[lp.p];
+  lp.feedback={ok:pr.options[i]===pr.answer,answer:pr.answer};
+  renderPlayer();
+}
+function playerCheckWrite(){
+  var lp=LESSON_PLAYER;var pr=lp.units[lp.u].practices[lp.p];
+  var v=document.getElementById("playerWrite").value.trim();
+  var norm=function(s){return s.toLowerCase().replace(/\s+/g,"");};
+  lp.feedback={ok:norm(v)===norm(pr.answer),answer:pr.answer};
+  renderPlayer();
+}
+function playerOrderTap(i){
+  var lp=LESSON_PLAYER;var pr=lp.units[lp.u].practices[lp.p];
+  var w=lp.orderRemaining[i];var next=pr.sorted[lp.orderPlaced.length];
+  if(w===next){lp.orderPlaced.push(w);lp.orderRemaining.splice(i,1);lp.orderMsg="";
+    if(!lp.orderRemaining.length){lp.feedback={ok:true,answer:pr.sorted.map(function(x){return x.w;}).join(" · ")};}
+  } else {var kw=orderKey(lp.code,w),kn=orderKey(lp.code,next);lp.orderMsg="Not yet. That word comes "+(kw<kn?"before":"after")+" the next word in alphabetical order. Try again.";}
+  renderPlayer();
+}
+function playerNext(){
+  var lp=LESSON_PLAYER;lp.feedback=null;lp.p++;
+  if(lp.p>=2){lp.p=0;lp.u++;}
+  if(lp.u>=15){startMiniTest(lp);return;}
+  var pr=lp.units[lp.u].practices[lp.p];
+  if(pr.type==="order"){lp.orderPlaced=[];lp.orderRemaining=pr.words.slice();lp.orderMsg="";}
+  else{lp.orderPlaced=null;lp.orderRemaining=null;lp.orderMsg="";}
+  renderPlayer();
+}
+function startMiniTest(lp){
+  var qs=miniTestQuestions(lp.code,lp.level,lp.idx);
+  startQuiz({code:lp.code,level:lp.level,title:lp.title+" mini test",lessonId:lp.lid,questions:qs});
+}
+function smoothPath(pts){
+  if(pts.length<2)return "";
+  var d="M "+pts[0].x+" "+pts[0].y;
+  for(var i=0;i<pts.length-1;i++){
+    var p0=pts[Math.max(0,i-1)],p1=pts[i],p2=pts[i+1],p3=pts[Math.min(pts.length-1,i+2)];
+    var c1x=p1.x+(p2.x-p0.x)/6,c1y=p1.y+(p2.y-p0.y)/6;
+    var c2x=p2.x-(p3.x-p1.x)/6,c2y=p2.y-(p3.y-p1.y)/6;
+    d+=" C "+c1x.toFixed(1)+" "+c1y.toFixed(1)+" "+c2x.toFixed(1)+" "+c2y.toFixed(1)+" "+p2.x+" "+p2.y;
+  }
+  return d;
+}
 // ---- Tabs ----
 var TAB="home";
 function setTab(t){TAB=t;render();}
@@ -445,6 +766,7 @@ function renderHome(){
   var html='<h2>Good day, '+esc(S.name)+'</h2><p>Continue where you left off, and keep your streak going.</p>';
   html+='<div class="grid grid2"><div class="card"><div class="kbd">Continue Learning</div><h3 style="margin:6px 0">'+esc(LANG_DB[curLang].name)+' · '+(cur.lesson?esc(cur.lesson.title):esc(currentLevel(curLang)+" Level Exam"))+'</h3><button class="btn btn-primary" type="button" onclick="'+(cur.lesson?'openLesson('+q(curLang)+','+q(cur.level)+','+(parseInt(cur.lesson.id.split("-L")[1])-1)+')':'openLevelExam('+q(curLang)+','+q(cur.level)+')')+'">Continue</button></div>';
   html+='<div class="card"><div class="kbd">Learning streak</div><h3 style="margin:6px 0">'+streakFire(langState(curLang).streak||0)+(langState(curLang).streak||0)+' days</h3><p style="margin:0">Daily goal: '+goalMin+' minutes · Today: '+Math.round(todaySecs/60)+' minutes ('+dailyPct+'%)</p><div class="progress-track" style="margin-top:10px"><div class="progress-fill" style="width:'+dailyPct+'%"></div></div></div></div>';
+  html+='<h3>Your plan for today</h3>'+planCard(curLang);
   html+='<h3>Recently studied languages</h3><div class="grid grid2">'+(S.recentLangs.length?S.recentLangs.map(function(c){return langCard(c);}).join(""):'<p>No study yet. Open Learn and start your first lesson.</p>')+'</div>';
   html+='<h3>Weekly activity</h3><div class="card"><div class="bar">'+last7Days().map(function(d){var secs=0;Object.keys(S.langs).forEach(function(c){secs+=S.langs[c].activity[d]||0;});var mins=Math.round(secs/60);return '<i style="height:'+Math.max(6,Math.min(72,mins*3))+'px" title="'+d+': '+mins+' min"></i>';}).join("")+'</div><div style="display:flex;justify-content:space-between" class="kbd">'+last7Days().map(function(d){return '<span>'+d.slice(5)+'</span>';}).join("")+'</div></div>';
   html+='<h3>Recommended lesson</h3><p>'+(cur.lesson?esc(cur.lesson.title)+' in '+esc(LANG_DB[curLang].name):'Take the '+currentLevel(curLang)+' level exam in '+esc(LANG_DB[curLang].name))+'</p>';
@@ -538,28 +860,47 @@ function openLang(code){
   S.currentLang=code;save();
   var L=LANG_DB[code];var cur=currentLesson(code);
   var html='<button class="btn btn-sm" type="button" onclick="setTab(\'learn\')">← All languages</button>';
-  html+='<h2>'+esc(L.name)+'</h2><p>'+esc(L.native)+' · Current level: '+currentLevel(code)+' '+LEVEL_NAMES[currentLevel(code)]+' · '+progressPct(code)+'% complete</p>';
+  html+='<h2>'+esc(L.name)+'</h2><p>'+esc(L.native)+' · Current level: '+currentLevel(code)+' '+LEVEL_NAMES[currentLevel(code)]+' · '+progressPct(code)+'% complete'+(langState(code).placedLevel?(' · Placed at '+langState(code).placedLevel+' by diagnostic'):'')+'</p>';
   html+='<div class="card"><div class="kbd">Continue Learning</div><h3 style="margin:6px 0">'+(cur.lesson?esc(cur.lesson.title):esc(currentLevel(code)+" Level Exam"))+'</h3><button class="btn btn-primary" type="button" onclick="'+(cur.lesson?'openLesson('+q(code)+','+q(cur.level)+','+(parseInt(cur.lesson.id.split("-L")[1])-1)+')':'openLevelExam('+q(code)+','+q(cur.level)+')')+'">Continue</button></div>';
+  html+=planCard(code);
   html+='<h3>Learning Path</h3>';
-  html+='<p class="note">1 energy per lesson · refills 10 per hour · max 10. Practice games, vocabulary lists, grammar, and alphabet games are free.</p>';
-  html+='<div class="roadmap">';
+  html+='<p class="note">20 lessons per level · 120 lessons per language · 1 energy per lesson · refills 10 per hour · max 10. Practice games, vocabulary lists, grammar, and alphabet games are free.</p>';
+  html+='<div style="margin:12px 0"><button class="btn" type="button" onclick="jumpToNode(\'road-current\')">Jump to your plan</button> <span class="kbd">Your roadmap is personal: the recommended node glows, review-due lessons carry a Due badge.</span></div>';
+  html+='<details><summary>How your personal plan works</summary><p class="note">This is an on-device adaptive plan, not a cloud model and not a trained neural network. Your survey sets your goal and daily minutes. The placement test estimates your starting level. After every quiz, a simplified Bayesian Knowledge Tracing estimate updates each skill (starting mastery 0.3, learning 0.2, guessing 0.2, slipping 0.1), and completed lessons and words get SM-2 style review dates (first review after 1 day, then 6 days, then longer by an easiness factor starting at 2.5; a failed recall resets to 1 day). Each lesson has 15 units, 2 practices per unit, 30 practices, then a small test, about 15 minutes. A lesson counts as done only after its small test. Your daily plan puts due reviews first, then your weakest skill, then the next roadmap lesson, and stays within your surveyed daily minutes. Nothing leaves this device.</p></details>';
+  var ROWH=76;
   LEVEL_ORDER.forEach(function(lv){
     var locked=!levelUnlocked(code,lv);
     html+='<div class="road-banner">'+lv+' '+LEVEL_NAMES[lv]+(locked?' · Locked':'')+'</div>';
-    var pos=[0,-52,-26,26,52,26,-26,-52];
-    allLessons(code,lv).forEach(function(l,idx){
-      var done=langState(code).doneLessons.indexOf(l.id)>=0;
-      var un=lessonUnlocked(code,lv,idx);
-      var isCur=!!(cur.lesson&&cur.lesson.id===l.id);
-      var cls=done?'done':(isCur?'current':(un?'ready':'locked'));
-      html+='<div class="road-node-wrap" style="margin-left:'+pos[idx]+'px"><button class="road-node '+cls+'" '+(un?'':'disabled')+' type="button" onclick="openLesson('+q(code)+','+q(lv)+','+idx+')" aria-label="'+esc(l.title)+'"><span>'+(done?icon("check"):isCur?icon("play"):un?icon("play"):icon("lock"))+'</span></button><span class="road-label">'+esc(l.title)+(done?' · Completed':isCur?' · Current':un?' · Ready':' · Locked')+'</span></div>';
+    var entries=[];
+    allLessons(code,lv).forEach(function(l,idx){entries.push({exam:false,idx:idx,meta:l});});
+    entries.push({exam:true,idx:-1,meta:null});
+    var pts=entries.map(function(e,i){return {x:50+Math.round(20*Math.sin(i*0.85)),off:Math.round(20*Math.sin(i*0.85)),y:i*ROWH+38};});
+    var fullD=smoothPath(pts);
+    var lastDone=-1;var curInLevel=-1;
+    entries.forEach(function(e,i){
+      var done=e.exam?!!langState(code).examPass[lv]:(langState(code).doneLessons.indexOf(e.meta.id)>=0);
+      if(done)lastDone=i;
+      if(cur.lesson&&cur.level===lv&&!e.exam&&cur.lesson.id===e.meta.id)curInLevel=i;
+      if(cur.exam&&cur.level===lv&&e.exam)curInLevel=i;
     });
-    var examDone=!!langState(code).examPass[lv];
-    var examUn=allLessons(code,lv).every(function(l){return langState(code).doneLessons.indexOf(l.id)>=0;});
-    var examCls=examDone?'done':(examUn?'current':'locked');
-    html+='<div class="road-node-wrap" style="margin-left:'+pos[7]+'px"><button class="road-node examnode '+examCls+'" '+(examUn?'':'disabled')+' type="button" onclick="openLevelExam('+q(code)+','+q(lv)+')" aria-label="'+lv+' Level Exam"><span>'+icon("star")+'</span></button><span class="road-label">'+lv+' Level Exam (10 questions, pass 70%)'+(examDone?' · Passed':examUn?' · Ready':' · Locked')+'</span></div>';
+    var cut=curInLevel>=0?curInLevel:lastDone;
+    var doneD=cut>=1?smoothPath(pts.slice(0,cut+1)):"";
+    var LVH=entries.length*ROWH;
+    var nodesHtml='';
+    entries.forEach(function(e,i){
+      var done=e.exam?!!langState(code).examPass[lv]:(langState(code).doneLessons.indexOf(e.meta.id)>=0);
+      var un=e.exam?allLessons(code,lv).every(function(l){return langState(code).doneLessons.indexOf(l.id)>=0;}):lessonUnlocked(code,lv,e.idx);
+      var isCur=curInLevel===i;
+      var half=isCur?39:32;
+      var cls=done?'done':(isCur?'current':(un?'ready':'locked'));
+      var btnId=isCur?'road-current':('road-'+code+'-'+lv+'-'+(e.exam?'exam':'L'+(e.idx+1)));
+      var due=!e.exam&&isDueLesson(code,e.meta.id);
+      nodesHtml+='<button id="'+btnId+'" class="road-node road-abs '+cls+(e.exam?' examnode':'')+'" style="left:calc(50% + '+pts[i].off+'% - '+half+'px);top:'+(pts[i].y-half)+'px" '+(un?'':'disabled')+' type="button" onclick="'+(e.exam?('openLevelExam('+q(code)+','+q(lv)+')'):('openLesson('+q(code)+','+q(lv)+','+e.idx+')'))+'" aria-label="'+esc(e.exam?(lv+' Level Exam'):e.meta.title)+'"><span>'+(done?icon("check"):isCur?icon("play"):un?icon("play"):icon("lock"))+'</span>'+(due?'<span class="road-due">Due</span>':'')+'</button>';
+      if(isCur)nodesHtml+='<span class="road-start" style="left:calc(50% + '+pts[i].off+'%);top:'+(pts[i].y-half-26)+'px">START</span>';
+      nodesHtml+='<span class="road-nodelabel" style="left:calc(50% + '+pts[i].off+'%);top:'+(pts[i].y+half+4)+'px">'+esc(e.exam?'Exam':e.meta.kindLabel)+'<br><span class="kbd">'+(done?'Completed':isCur?'Current':un?'Ready':'Locked')+(due?' · Review due':'')+'</span></span>';
+    });
+    html+='<div class="road-level" style="height:'+LVH+'px"><svg class="road-svg" viewBox="0 0 100 '+LVH+'" preserveAspectRatio="none" aria-hidden="true"><path d="'+fullD+'" fill="none" style="stroke:var(--line)" stroke-width="3" vector-effect="non-scaling-stroke" stroke-linecap="round"/>'+(doneD?'<path d="'+doneD+'" fill="none" style="stroke:#22A06B" stroke-width="3" vector-effect="non-scaling-stroke" stroke-linecap="round"/>':'')+'</svg>'+nodesHtml+'</div>';
   });
-  html+='</div>';
   html+='<h3>Vocabulary</h3>';
   LEVEL_ORDER.forEach(function(lv){html+='<details><summary>'+lv+' vocabulary, '+levelData(code,lv).vocab.length+' words</summary>'+levelData(code,lv).vocab.map(function(w){return wordCard(code,w);}).join("")+'</details>';});
   html+='<h3>Grammar</h3>';
@@ -576,6 +917,7 @@ function openLang(code){
   CERTS.filter(function(c){return c[2]===code;}).forEach(function(c){html+='<button class="card" style="width:100%;text-align:left;color:var(--ink);margin:8px 0" type="button" onclick="openCert('+q(c[0])+')"><b>'+esc(c[1])+'</b><p style="margin:4px 0 0">'+esc(c[4])+'</p></button>';});
   if(!CERTS.filter(function(c){return c[2]===code;}).length)html+='<p>No exam body covers this language, so this language uses the structured proficiency pathway instead.</p>';
   document.getElementById("app").innerHTML=html;renderTabs();
+  var cn=document.getElementById("road-current");if(cn&&cn.scrollIntoView)cn.scrollIntoView({block:"center",behavior:"auto"});
 }
 function renderPractice(){
   var code=S.currentLang;var lv=currentLevel(code);
@@ -609,9 +951,10 @@ function startDailyChallenge(){
 function renderProgress(){
   var totalLessons=0,doneLessons=0,totalSecs=0,totalTests=0,totalScore=0,totalQ=0,totalLearned=0;
   Object.keys(S.langs).forEach(function(c){var st=S.langs[c];doneLessons+=st.doneLessons.length;totalSecs+=st.studySeconds;st.testHistory.forEach(function(t){totalTests++;totalScore+=t.score;totalQ+=t.total;});totalLearned+=st.learnedWords.length;});
-  totalLessons=Object.keys(LANG_DB).length*42;
+  totalLessons=Object.keys(LANG_DB).length*120;
   var html='<h2>Progress</h2><div class="stat"><div class="card"><b>'+doneLessons+' / '+totalLessons+'</b><span>Lessons completed</span></div><div class="card"><b>'+Math.round(totalSecs/60)+' min</b><span>Study time</span></div><div class="card"><b>'+(totalQ?Math.round(totalScore/totalQ*100):0)+'%</b><span>Average test score ('+totalTests+' tests)</span></div><div class="card"><b>'+totalLearned+'</b><span>Words learned</span></div></div>';
   html+='<h3>Progress for every language</h3><div class="grid grid2">'+Object.keys(LANG_DB).map(function(c){return '<div class="card"><b>'+esc(LANG_DB[c].name)+'</b><p style="margin:4px 0">Level '+currentLevel(c)+' · '+langState(c).doneLessons.length+' lessons · '+streakFire(langState(c).streak||0)+'Streak '+(langState(c).streak||0)+' days</p><div class="progress-track"><div class="progress-fill" style="width:'+progressPct(c)+'%"></div></div><div class="kbd">'+progressPct(c)+'% complete</div></div>';}).join("")+'</div>';
+  html+='<h3>Skill mastery (on-device adaptive plan)</h3><div class="card">'+ADAPT_SKILLS.map(function(s){var v=Math.round(masteryEnsure(S.currentLang)[s]*100);return '<p style="margin:8px 0">'+esc(s)+' · '+v+'%</p><div class="progress-track"><div class="progress-fill" style="width:'+v+'%"></div></div>';}).join("")+'<p class="note">Mastery is a simplified Bayesian estimate updated after every quiz answer on this device. It is not a certified level.</p></div>';
   html+='<h3>Test history</h3>';
   var hist=[];Object.keys(S.langs).forEach(function(c){S.langs[c].testHistory.forEach(function(t){hist.push({c:c,t:t});});});
   hist=hist.slice(-20).reverse();
@@ -622,6 +965,7 @@ function renderProfile(){
   var html='<h2>Profile</h2><div class="card"><label for="nameEdit">Your name</label><input class="input" id="nameEdit" value="'+esc(S.name)+'"><button class="btn btn-primary" style="margin-top:10px" type="button" onclick="S.name=document.getElementById(\'nameEdit\').value.trim()||S.name;save();toast(\'Name saved\');render()">Save name</button></div>';
   html+='<h3>Selected languages</h3><div class="card">'+Object.keys(LANG_DB).map(function(c){var on=S.selected.indexOf(c)>=0;return '<label style="display:flex;gap:10px;align-items:center"><input type="checkbox" '+(on?'checked':'')+' onchange="toggleLang('+q(c)+',this.checked)"> '+esc(LANG_DB[c].name)+'</label>';}).join("")+'<p class="note">At least one language must stay selected.</p></div>';
   html+='<h3>Preferences</h3><div class="card"><label>Theme</label><select class="input" id="themeSel" onchange="S.prefs.theme=this.value;save();render()"><option value="light" '+(S.prefs.theme==="light"?'selected':'')+'>Light</option><option value="dark" '+(S.prefs.theme==="dark"?'selected':'')+'>Dark</option></select><label>Daily goal (minutes)</label><input class="input" type="number" min="5" max="180" id="goalIn" value="'+(S.prefs.dailyGoalMin||20)+'"><button class="btn" style="margin-top:10px" type="button" onclick="S.prefs.dailyGoalMin=parseInt(document.getElementById(\'goalIn\').value)||20;save();render()">Save goal</button><label style="display:flex;gap:10px;align-items:center"><input type="checkbox" '+(S.prefs.voice?'checked':'')+' onchange="S.prefs.voice=this.checked;save()"> Spoken playback where supported</label></div>';
+  html+='<h3>Starting survey and placement</h3><div class="card">'+S.selected.map(function(c){var st=langState(c);return '<p><b>'+esc(LANG_DB[c].name)+'</b> · '+(st.survey?('Survey done'):('No survey yet'))+' · '+(st.diag?('Placed at '+st.diag.level):(st.diagSkipped?'Placement skipped, starting at A1':'No placement yet'))+'</p><div style="display:flex;flex-wrap:wrap;gap:8px;margin-bottom:10px"><button class="btn btn-sm" type="button" onclick="openSurvey('+q(c)+')">Retake survey</button><button class="btn btn-sm" type="button" onclick="startDiag('+q(c)+')">Retake placement test</button></div>';}).join("")+'</div>';
   html+='<h3>About this app</h3><div class="card" style="display:flex;flex-wrap:wrap;gap:8px"><button class="btn" type="button" onclick="showReadFirst()">Read Before You Use The App</button><a class="btn" href="terms.html" target="_blank" rel="noopener">Terms and Conditions</a><a class="btn" href="privacy.html" target="_blank" rel="noopener">Privacy Policy</a><a class="btn" href="cookies.html" target="_blank" rel="noopener">Cookie Policy</a></div>';
   html+='<h3>Local data controls</h3><div class="card" style="display:flex;flex-wrap:wrap;gap:8px"><button class="btn" type="button" onclick="exportData()">Export data as JSON</button><label class="btn" style="cursor:pointer">Import JSON<input type="file" accept=".json,application/json" style="display:none" onchange="importData(this)"></label><button class="btn" type="button" onclick="if(confirm(\'Clear all NES:Learn data on this device? This cannot be undone.\')){localStorage.removeItem(LS_KEY);location.reload();}">Clear all local data</button></div>';
   return html;
