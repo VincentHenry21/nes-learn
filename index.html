@@ -108,6 +108,22 @@ details summary{font-weight:700;cursor:pointer;font-size:15px}
 .readfirst-box{background:var(--card);color:var(--ink);border-radius:24px;width:100%;max-width:560px;max-height:88vh;overflow:auto;padding:22px}
 .legal-footer{max-width:1060px;margin:0 auto;padding:10px 16px 110px;text-align:center;font-size:13px;color:var(--ink2)}
 .legal-footer a{color:var(--brand);text-decoration:none;margin:0 8px}
+.energy-badge{display:inline-flex;align-items:center;gap:6px;background:var(--card);border:1px solid var(--line);border-radius:999px;padding:6px 10px;font-size:14px;font-weight:700;color:var(--ink);white-space:nowrap}
+.energy-badge svg{width:18px;height:18px;color:#F5B301}
+.energy-badge span{font-weight:500;color:var(--ink2);font-size:12px}
+.roadmap{position:relative;padding:6px 0}
+.roadmap:before{content:"";position:absolute;left:50%;top:0;bottom:0;width:4px;margin-left:-2px;background:var(--line);border-radius:2px}
+.road-banner{position:relative;z-index:1;margin:20px auto 6px;width:max-content;background:var(--brand);color:#fff;padding:8px 18px;border-radius:999px;font-weight:700;font-size:15px}
+.road-node-wrap{position:relative;z-index:1;display:flex;flex-direction:column;align-items:center;margin:14px 0}
+.road-node{width:64px;height:64px;border-radius:50%;border:3px solid var(--line);background:var(--card);color:var(--ink);display:flex;align-items:center;justify-content:center;transition:transform .18s ease-out,box-shadow .18s ease-out;cursor:pointer}
+.road-node svg{width:28px;height:28px}
+.road-node.done{background:#22A06B;border-color:#22A06B;color:#fff}
+.road-node.current{width:78px;height:78px;background:var(--brand);border-color:var(--brand);color:#fff;box-shadow:0 0 0 6px color-mix(in srgb,var(--brand) 25%,transparent)}
+.road-node.locked{opacity:.55}
+.road-node.examnode{background:#F5B301;border-color:#F5B301;color:#fff}
+.road-node:disabled{cursor:not-allowed}
+.road-node:active:not(:disabled){transform:scale(.94)}
+.road-label{margin-top:6px;font-size:12px;font-weight:600;text-align:center;max-width:200px;color:var(--ink2)}
 @media (prefers-reduced-motion:reduce){*,*:before,*:after{animation:none!important;transition:none!important}}
 </style>
 </head>
@@ -116,6 +132,7 @@ details summary{font-weight:700;cursor:pointer;font-size:15px}
 <div class="logo-mark" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M12 3c2.5 2.6 3.8 5.6 3.8 9S14.5 18.4 12 21c-2.5-2.6-3.8-5.6-3.8-9S9.5 5.6 12 3Z"/><path d="M3.5 9h17M3.5 15h17"/></svg></div>
 <div><h1>NES:Learn</h1><small>Learn Beyond Language</small></div>
 <div class="spacer"></div>
+<span class="energy-badge" id="energyBadge" aria-label="Energy"></span>
 <button class="icon-btn" id="themeBtn" type="button" aria-label="Toggle light and dark mode"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12.8A9 9 0 1 1 11.2 3 7 7 0 0 0 21 12.8Z"/></svg></button>
 </div></div>
 <main id="app" aria-live="polite"></main>
@@ -146,10 +163,16 @@ function q(s){return "'"+String(s).replace(/'/g,"\\'")+"'";}
 function todayStr(d){d=d||new Date();return d.getFullYear()+"-"+String(d.getMonth()+1).padStart(2,"0")+"-"+String(d.getDate()).padStart(2,"0");}
 function yesterdayStr(){var d=new Date();d.setDate(d.getDate()-1);return todayStr(d);}
 function blankLang(){return {doneLessons:[],examPass:{},examScores:{},testHistory:[],savedWords:[],learnedWords:[],studySeconds:0,lastStudyDate:"",streak:0,activity:{},cert:{},alphaCompleted:0};}
-function defaultState(){var s={v:1,name:"",selected:["en","my"],currentLang:"en",prefs:{theme:"light",dailyGoalMin:20,voice:true},langs:{},recentLangs:[],accepted:false};Object.keys(LANG_DB).forEach(function(c){s.langs[c]=blankLang();});return s;}
-function loadState(){try{var raw=localStorage.getItem(LS_KEY);if(!raw)return defaultState();var s=JSON.parse(raw);if(!s.langs)s.langs={};Object.keys(LANG_DB).forEach(function(c){if(!s.langs[c])s.langs[c]=blankLang();});if(!s.prefs)s.prefs={theme:"light",dailyGoalMin:20,voice:true};if(typeof s.accepted!=="boolean")s.accepted=false;if(!s.selected||!s.selected.length)s.selected=["en"];return s;}catch(e){return defaultState();}}
+function defaultState(){var s={v:1,name:"",selected:["en","my"],currentLang:"en",prefs:{theme:"light",dailyGoalMin:20,voice:true},langs:{},recentLangs:[],accepted:false,energy:{v:10,max:10,t:0}};Object.keys(LANG_DB).forEach(function(c){s.langs[c]=blankLang();});return s;}
+function loadState(){try{var raw=localStorage.getItem(LS_KEY);if(!raw)return defaultState();var s=JSON.parse(raw);if(!s.langs)s.langs={};Object.keys(LANG_DB).forEach(function(c){if(!s.langs[c])s.langs[c]=blankLang();});if(!s.prefs)s.prefs={theme:"light",dailyGoalMin:20,voice:true};if(typeof s.accepted!=="boolean")s.accepted=false;if(!s.energy||typeof s.energy.v!=="number")s.energy={v:10,max:10,t:0};if(typeof s.energy.max!=="number")s.energy.max=10;if(typeof s.energy.t!=="number")s.energy.t=0;if(s.energy.v>s.energy.max)s.energy.v=s.energy.max;if(s.energy.v<0)s.energy.v=0;if(!s.selected||!s.selected.length)s.selected=["en"];return s;}catch(e){return defaultState();}}
 var S = loadState();
 function save(){localStorage.setItem(LS_KEY,JSON.stringify(S));applyTheme();}
+var ENERGY_MAX=10,ENERGY_MINUTES=6,ENERGY_MS=360000;
+function energyEnsure(){if(!S.energy||typeof S.energy.v!=="number")S.energy={v:ENERGY_MAX,max:ENERGY_MAX,t:0};if(typeof S.energy.max!=="number")S.energy.max=ENERGY_MAX;if(typeof S.energy.t!=="number")S.energy.t=0;if(S.energy.v>S.energy.max)S.energy.v=S.energy.max;if(S.energy.v<0)S.energy.v=0;}
+function regenEnergy(){energyEnsure();if(S.energy.v>=S.energy.max){if(S.energy.t!==0){S.energy.t=0;save();}return;}var now=Date.now();if(!S.energy.t){S.energy.t=now;save();return;}var added=Math.floor((now-S.energy.t)/ENERGY_MS);if(added>0){S.energy.v=Math.min(S.energy.max,S.energy.v+added);S.energy.t+=added*ENERGY_MS;if(S.energy.v>=S.energy.max)S.energy.t=0;save();}}
+function energyMinutesToNext(){energyEnsure();if(S.energy.v>=S.energy.max)return 0;if(!S.energy.t)return ENERGY_MINUTES;return Math.max(1,Math.ceil((ENERGY_MS-(Date.now()-S.energy.t))/60000));}
+function updateEnergyBadge(){var b=document.getElementById("energyBadge");if(!b)return;energyEnsure();b.innerHTML='<svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M13 2 4 14h6l-1 8 9-12h-6l1-8Z"/></svg><b>'+S.energy.v+'</b>'+(S.energy.v<S.energy.max?'<span>next in '+energyMinutesToNext()+'m</span>':'<span>full</span>');}
+function spendEnergy(){regenEnergy();if(S.energy.v<=0){toast("Out of energy. Next energy in "+energyMinutesToNext()+" minutes.");return false;}var wasMax=S.energy.v>=S.energy.max;S.energy.v--;if(wasMax)S.energy.t=Date.now();save();updateEnergyBadge();return true;}
 function applyTheme(){document.body.setAttribute("data-theme",S.prefs.theme==="dark"?"dark":"light");}
 function langState(code){return S.langs[code];}
 function levelData(code,level){return LANG_DB[code].levels[level];}
@@ -340,6 +363,7 @@ function toggleSave(code,id){var st=langState(code);var i=st.savedWords.indexOf(
 function openLesson(code,level,idx){
   var meta=lessonMeta(code,level,idx);var lv=levelData(code,level);var lid=meta.id;
   if(!lessonUnlocked(code,level,idx)){toast("This lesson is locked. Complete the previous lesson first.");return;}
+  if(!spendEnergy())return;
   var html=sheetHead(meta.title,LANG_DB[code].name+" · "+level+" "+LEVEL_NAMES[level]);
   if(meta.kind==="vocab"){
     var words=idx===0?lv.vocab.slice(0,10):lv.vocab.slice(10,20);
@@ -381,6 +405,7 @@ function openLevelExam(code,level){
   var lv=levelData(code,level);
   var done=allLessons(code,level).every(function(l){return langState(code).doneLessons.indexOf(l.id)>=0;});
   if(!done){toast("Complete all 7 lessons in this level first.");return;}
+  if(!spendEnergy())return;
   startQuiz({code:code,level:level,title:level+" Level Exam",examLevel:level,questions:levelExamQuestions(code,level)});
 }
 function openCert(certId){
@@ -516,16 +541,25 @@ function openLang(code){
   html+='<h2>'+esc(L.name)+'</h2><p>'+esc(L.native)+' · Current level: '+currentLevel(code)+' '+LEVEL_NAMES[currentLevel(code)]+' · '+progressPct(code)+'% complete</p>';
   html+='<div class="card"><div class="kbd">Continue Learning</div><h3 style="margin:6px 0">'+(cur.lesson?esc(cur.lesson.title):esc(currentLevel(code)+" Level Exam"))+'</h3><button class="btn btn-primary" type="button" onclick="'+(cur.lesson?'openLesson('+q(code)+','+q(cur.level)+','+(parseInt(cur.lesson.id.split("-L")[1])-1)+')':'openLevelExam('+q(code)+','+q(cur.level)+')')+'">Continue</button></div>';
   html+='<h3>Learning Path</h3>';
+  html+='<p class="note">1 energy per lesson · refills 10 per hour · max 10. Practice games, vocabulary lists, grammar, and alphabet games are free.</p>';
+  html+='<div class="roadmap">';
   LEVEL_ORDER.forEach(function(lv){
     var locked=!levelUnlocked(code,lv);
-    html+='<details '+(lv===currentLevel(code)?'open':'')+'><summary>'+lv+' '+LEVEL_NAMES[lv]+(locked?' · Locked':'')+'</summary><p>'+esc(LEVEL_THEMES[lv])+'.</p>';
+    html+='<div class="road-banner">'+lv+' '+LEVEL_NAMES[lv]+(locked?' · Locked':'')+'</div>';
+    var pos=[0,-52,-26,26,52,26,-26,-52];
     allLessons(code,lv).forEach(function(l,idx){
       var done=langState(code).doneLessons.indexOf(l.id)>=0;
       var un=lessonUnlocked(code,lv,idx);
-      html+='<button class="lesson-row" '+(un?'':'disabled')+' type="button" onclick="openLesson('+q(code)+','+q(lv)+','+idx+')"><span>'+(done?icon("check"):un?icon("play"):icon("lock"))+'</span><span class="t"><b>'+esc(l.title)+'</b><span>'+esc(l.kindLabel)+(done?' · Completed':un?' · Ready':' · Locked')+'</span></span></button>';
+      var isCur=!!(cur.lesson&&cur.lesson.id===l.id);
+      var cls=done?'done':(isCur?'current':(un?'ready':'locked'));
+      html+='<div class="road-node-wrap" style="margin-left:'+pos[idx]+'px"><button class="road-node '+cls+'" '+(un?'':'disabled')+' type="button" onclick="openLesson('+q(code)+','+q(lv)+','+idx+')" aria-label="'+esc(l.title)+'"><span>'+(done?icon("check"):isCur?icon("play"):un?icon("play"):icon("lock"))+'</span></button><span class="road-label">'+esc(l.title)+(done?' · Completed':isCur?' · Current':un?' · Ready':' · Locked')+'</span></div>';
     });
-    html+='<button class="btn btn-block" style="margin-top:10px" type="button" onclick="openLevelExam('+q(code)+','+q(lv)+')">'+lv+' Level Exam (10 questions, pass 70%)</button></details>';
+    var examDone=!!langState(code).examPass[lv];
+    var examUn=allLessons(code,lv).every(function(l){return langState(code).doneLessons.indexOf(l.id)>=0;});
+    var examCls=examDone?'done':(examUn?'current':'locked');
+    html+='<div class="road-node-wrap" style="margin-left:'+pos[7]+'px"><button class="road-node examnode '+examCls+'" '+(examUn?'':'disabled')+' type="button" onclick="openLevelExam('+q(code)+','+q(lv)+')" aria-label="'+lv+' Level Exam"><span>'+icon("star")+'</span></button><span class="road-label">'+lv+' Level Exam (10 questions, pass 70%)'+(examDone?' · Passed':examUn?' · Ready':' · Locked')+'</span></div>';
   });
+  html+='</div>';
   html+='<h3>Vocabulary</h3>';
   LEVEL_ORDER.forEach(function(lv){html+='<details><summary>'+lv+' vocabulary, '+levelData(code,lv).vocab.length+' words</summary>'+levelData(code,lv).vocab.map(function(w){return wordCard(code,w);}).join("")+'</details>';});
   html+='<h3>Grammar</h3>';
@@ -607,6 +641,7 @@ function importData(input){
   r.readAsText(f);
 }
 function render(){
+  regenEnergy();updateEnergyBadge();
   renderTabs();
   if(!S.name){document.getElementById("app").innerHTML=renderOnboarding();return;}
   var html="";
@@ -620,6 +655,7 @@ function render(){
 document.getElementById("themeBtn").addEventListener("click",function(){S.prefs.theme=S.prefs.theme==="dark"?"light":"dark";save();render();});
 applyTheme();
 render();
+setInterval(function(){regenEnergy();updateEnergyBadge();},30000);
 document.getElementById("readAcceptBtn").addEventListener("click",function(){S.accepted=true;save();hideReadFirst();});
 if(!S.accepted)showReadFirst();
 window.NESLearnTest={getState:function(){return S;},LANG_DB:LANG_DB,currentLesson:currentLesson,progressPct:progressPct,levelUnlocked:levelUnlocked,ALPHABETS:ALPHABETS,orderKey:orderKey};
