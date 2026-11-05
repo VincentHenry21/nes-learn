@@ -164,6 +164,53 @@ details summary{font-weight:700;cursor:pointer;font-size:15px}
 .road-start{position:absolute;transform:translateX(-50%);background:var(--brand);color:#fff;font-size:11px;font-weight:800;padding:3px 10px;border-radius:999px;z-index:2;white-space:nowrap}
 .road-due{position:absolute;top:-8px;right:-8px;background:#E5484D;color:#fff;font-size:10px;font-weight:800;padding:2px 7px;border-radius:999px;z-index:2}
 .road-nodelabel{position:absolute;transform:translateX(-50%);width:150px;text-align:center;font-size:12px;font-weight:600;color:var(--ink2);z-index:1;line-height:1.3}
+.flag{width:30px;height:22px;border-radius:4px;overflow:hidden;flex:none;border:1px solid var(--line);display:inline-block;vertical-align:middle;background:#fff}
+.flag svg{width:100%;height:100%;display:block}
+.flag-lg{width:44px;height:32px;border-radius:6px}
+.btn .flag{width:22px;height:16px}
+.hero{background:linear-gradient(135deg,#1800AD,#133DD6,#0D7BFF);color:#fff;border:0}
+.hero p{color:rgba(255,255,255,.88)}
+.hero .kbd{color:rgba(255,255,255,.85)}
+.hero .progress-track{background:rgba(255,255,255,.28)}
+.hero .progress-fill{background:#fff}
+.hero .btn-primary{background:#fff;color:#133DD6}
+.course-row{display:flex;gap:12px;align-items:center;padding:14px;border:1px solid var(--line);border-radius:16px;background:var(--card);width:100%;text-align:left;color:var(--ink);margin:8px 0}
+.course-row .t{flex:1;min-width:0}
+.course-row .t b{display:block;font-size:16px}
+.course-row .t span{font-size:13px;color:var(--ink2)}
+.tiles{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+@media(min-width:700px){.tiles{grid-template-columns:repeat(4,1fr)}}
+.qtile{border:1px solid var(--line);border-radius:16px;background:var(--card);padding:16px 12px;text-align:center;color:var(--ink);display:flex;flex-direction:column;align-items:center;gap:8px;font-weight:700;font-size:14px}
+.qtile svg{width:26px;height:26px;color:var(--brand)}
+.qtile span{font-size:12px;color:var(--ink2);font-weight:500}
+.menu-row{display:flex;gap:12px;align-items:center;padding:14px;border:1px solid var(--line);border-radius:14px;background:var(--card);width:100%;text-align:left;color:var(--ink);margin:8px 0;font-size:15px;font-weight:600}
+.menu-row svg{width:22px;height:22px;color:var(--brand);flex:none}
+.menu-row small{display:block;font-size:12px;color:var(--ink2);font-weight:500}
+.menu-row .chev{margin-left:auto;color:var(--ink2)}
+.ach{display:flex;gap:12px;align-items:center;padding:12px 0;border-top:1px solid var(--line)}
+.ach:first-child{border-top:0}
+.ach-badge{width:46px;height:46px;border-radius:50%;flex:none;display:grid;place-items:center;background:color-mix(in srgb,#22A06B 16%,var(--card));color:var(--good);border:1px solid var(--line)}
+.ach-badge svg{width:24px;height:24px}
+.ach.locked .ach-badge{background:var(--card2);color:var(--ink2)}
+.ach.locked{opacity:.75}
+.chip{display:inline-block;padding:9px 14px;border:1px solid var(--line);border-radius:999px;background:var(--card);color:var(--ink);margin:4px 4px 4px 0;font-size:15px}
+.chip.sel{border-color:var(--brand);background:color-mix(in srgb,var(--brand) 10%,var(--card))}
+.story-sent{display:flex;gap:10px;align-items:flex-start;padding:12px 0;border-top:1px solid var(--line)}
+.story-sent:first-child{border-top:0}
+.story-sent p{flex:1;margin:0;color:var(--ink);font-size:16px;line-height:1.6}
+.res-row{display:block;padding:14px;border:1px solid var(--line);border-radius:14px;background:var(--card);margin:8px 0;color:var(--ink);text-decoration:none}
+.res-row b{font-size:16px}
+.res-row p{margin:4px 0 0}
+.res-row .lic{font-size:12px;font-weight:700;color:var(--brand)}
+.week-chart{display:flex;gap:8px;align-items:flex-end;height:120px;padding-top:8px}
+.week-col{flex:1;display:flex;flex-direction:column;align-items:center;gap:4px;min-width:0}
+.week-col i{display:block;width:100%;max-width:44px;background:linear-gradient(180deg,#0D7BFF,#133DD6);border-radius:6px 6px 0 0;min-height:4px}
+.week-col b{font-size:12px}
+.week-col span{font-size:11px;color:var(--ink2)}
+#curFlag{display:inline-flex}
+#curFlag .flag{width:26px;height:19px}
+.player-count{font-size:13px;font-weight:700;color:var(--ink2)}
+.word-chip{display:inline-block;padding:10px 14px;border:1px solid var(--line);border-radius:12px;background:var(--card);color:var(--ink);margin:4px;font-size:16px}
 @media (prefers-reduced-motion:reduce){*,*:before,*:after{animation:none!important;transition:none!important}}
 </style>
 </head>
@@ -171,7 +218,7 @@ details summary{font-weight:700;cursor:pointer;font-size:15px}
 <div class="topbar"><div class="topbar-in">
 <div class="logo-mark" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M12 3c2.5 2.6 3.8 5.6 3.8 9S14.5 18.4 12 21c-2.5-2.6-3.8-5.6-3.8-9S9.5 5.6 12 3Z"/><path d="M3.5 9h17M3.5 15h17"/></svg></div>
 <div><h1>NES:Learn</h1><small>Learn Beyond Language</small></div>
-<div class="spacer"></div>
+<span id="curFlag" aria-label="Current language flag"></span><div class="spacer"></div>
 <span class="energy-badge" id="energyBadge" aria-label="Energy"></span>
 <button class="icon-btn" id="themeBtn" type="button" aria-label="Toggle light and dark mode"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12.8A9 9 0 1 1 11.2 3 7 7 0 0 0 21 12.8Z"/></svg></button>
 </div></div>
@@ -195,6 +242,8 @@ var CERTS = [["ielts", "IELTS", "en", "B2", "International English Language Test
 //  recentLangs:[code]}
 var ALPHABETS = {"en": {"note": "Standard A to Z order. Use this order in the game.", "items": [["A", "ay"], ["B", "bee"], ["C", "cee"], ["D", "dee"], ["E", "ee"], ["F", "ef"], ["G", "gee"], ["H", "aich"], ["I", "eye"], ["J", "jay"], ["K", "kay"], ["L", "el"], ["M", "em"], ["N", "en"], ["O", "oh"], ["P", "pee"], ["Q", "cue"], ["R", "ar"], ["S", "ess"], ["T", "tee"], ["U", "yoo"], ["V", "vee"], ["W", "double-yoo"], ["X", "ex"], ["Y", "why"], ["Z", "zee"]]}, "de": {"note": "Standard A to Z order. German also uses ä, ö, ü and ß; in the game they sort with their base letter.", "items": [["A", "ah"], ["B", "beh"], ["C", "tseh"], ["D", "deh"], ["E", "eh"], ["F", "ef"], ["G", "geh"], ["H", "hah"], ["I", "ee"], ["J", "yot"], ["K", "kah"], ["L", "el"], ["M", "em"], ["N", "en"], ["O", "oh"], ["P", "peh"], ["Q", "koo"], ["R", "er"], ["S", "ess"], ["T", "teh"], ["U", "oo"], ["V", "fow"], ["W", "veh"], ["X", "ix"], ["Y", "upsilon"], ["Z", "tset"]]}, "fr": {"note": "Standard A to Z order. French also uses accented letters such as é, è, ê, à and ç; in the game they sort with their base letter.", "items": [["A", "ah"], ["B", "beh"], ["C", "seh"], ["D", "deh"], ["E", "uh"], ["F", "ef"], ["G", "zheh"], ["H", "ash"], ["I", "ee"], ["J", "zhee"], ["K", "kah"], ["L", "el"], ["M", "em"], ["N", "en"], ["O", "oh"], ["P", "peh"], ["Q", "ku"], ["R", "er"], ["S", "ess"], ["T", "teh"], ["U", "u"], ["V", "veh"], ["W", "double-veh"], ["X", "ix"], ["Y", "ee-grek"], ["Z", "zed"]]}, "es": {"note": "Standard A to Z order. Spanish also uses ñ; in the game it sorts with n.", "items": [["A", "ah"], ["B", "beh"], ["C", "seh"], ["D", "deh"], ["E", "eh"], ["F", "efe"], ["G", "heh"], ["H", "ache"], ["I", "ee"], ["J", "hota"], ["K", "kah"], ["L", "ele"], ["M", "eme"], ["N", "ene"], ["O", "oh"], ["P", "peh"], ["Q", "koo"], ["R", "ere"], ["S", "ese"], ["T", "teh"], ["U", "oo"], ["V", "ooveh"], ["W", "ooveh-doble"], ["X", "ekis"], ["Y", "ee-griega"], ["Z", "seta"]]}, "zh": {"note": "Chinese has no alphabet. This is Pinyin initial order, the standard order used to arrange Chinese words in dictionaries.", "items": [["b", "ba"], ["p", "pa"], ["m", "ma"], ["f", "fa"], ["d", "da"], ["t", "ta"], ["n", "na"], ["l", "la"], ["g", "ga"], ["k", "ka"], ["h", "ha"], ["j", "ji"], ["q", "qi"], ["x", "xi"], ["zh", "zhi"], ["ch", "chi"], ["sh", "shi"], ["r", "ri"], ["z", "zi"], ["c", "ci"], ["s", "si"], ["y", "yi"], ["w", "wu"]]}, "ja": {"note": "Gojuon order, the standard order of the Japanese syllabary.", "items": [["あ", "a"], ["い", "i"], ["う", "u"], ["え", "e"], ["お", "o"], ["か", "ka"], ["き", "ki"], ["く", "ku"], ["け", "ke"], ["こ", "ko"], ["さ", "sa"], ["し", "shi"], ["す", "su"], ["せ", "se"], ["そ", "so"], ["た", "ta"], ["ち", "chi"], ["つ", "tsu"], ["て", "te"], ["と", "to"], ["な", "na"], ["に", "ni"], ["ぬ", "nu"], ["ね", "ne"], ["の", "no"], ["は", "ha"], ["ひ", "hi"], ["ふ", "fu"], ["へ", "he"], ["ほ", "ho"], ["ま", "ma"], ["み", "mi"], ["む", "mu"], ["め", "me"], ["も", "mo"], ["や", "ya"], ["ゆ", "yu"], ["よ", "yo"], ["ら", "ra"], ["り", "ri"], ["る", "ru"], ["れ", "re"], ["ろ", "ro"], ["わ", "wa"], ["を", "wo"], ["ん", "n"]]}, "ko": {"note": "Standard Hangul jamo order: consonants first, then vowels.", "items": [["ㄱ", "g/k"], ["ㄴ", "n"], ["ㄷ", "d/t"], ["ㄹ", "r/l"], ["ㅁ", "m"], ["ㅂ", "b/p"], ["ㅅ", "s"], ["ㅇ", "ng"], ["ㅈ", "j"], ["ㅊ", "ch"], ["ㅋ", "k"], ["ㅌ", "t"], ["ㅍ", "p"], ["ㅎ", "h"], ["ㅏ", "a"], ["ㅐ", "ae"], ["ㅑ", "ya"], ["ㅒ", "yae"], ["ㅓ", "eo"], ["ㅔ", "e"], ["ㅗ", "o"], ["ㅛ", "yo"], ["ㅜ", "u"], ["ㅠ", "yu"], ["ㅡ", "eu"], ["ㅢ", "ui"], ["ㅣ", "i"]]}, "my": {"note": "Standard Myanmar consonant order.", "items": [["က", "ka"], ["ခ", "kha"], ["ဂ", "ga"], ["ဃ", "gha"], ["င", "nga"], ["စ", "sa"], ["ဆ", "hsa"], ["ဇ", "za"], ["ဈ", "zya"], ["ည", "nya"], ["ဋ", "ta"], ["ဌ", "hta"], ["ဍ", "da"], ["ဎ", "dha"], ["ဏ", "na"], ["တ", "ta"], ["ထ", "hta"], ["ဒ", "da"], ["ဓ", "dha"], ["န", "na"], ["ပ", "pa"], ["ဖ", "hpa"], ["ဗ", "ba"], ["ဘ", "bha"], ["မ", "ma"], ["ယ", "ya"], ["ရ", "ra"], ["လ", "la"], ["ဝ", "wa"], ["သ", "tha"], ["ဟ", "ha"], ["ဠ", "la"], ["အ", "a"]]}};
 var WORD_DETAIL = {"hello": {"p": "interjection", "nt": "A safe greeting for almost every situation. 'Hi' is more casual."}, "thank you": {"p": "phrase", "nt": "Use 'thank you' in polite and formal speech. 'Thanks' is the short, casual form.", "mi": "Write it as two words: thank you, not thankyou."}, "goodbye": {"p": "interjection", "nt": "Use 'goodbye' when leaving. 'Bye' is the short, casual form."}, "please": {"p": "phrase", "nt": "Put 'please' at the start or end of a request."}, "yes": {"p": "interjection"}, "no": {"p": "interjection"}, "water": {"p": "noun", "dg": "n", "nt": "Water has no plural. Do not say 'waters' for drinking water in general."}, "food": {"p": "noun", "dg": "n", "nt": "Food has no plural in general use."}, "mother": {"p": "noun", "pl": "mothers", "dg": "f", "sy": "mom (casual)"}, "father": {"p": "noun", "pl": "fathers", "dg": "m", "sy": "dad (casual)"}, "friend": {"p": "noun", "pl": "friends", "dg": "m", "sy": "companion", "an": "enemy"}, "house": {"p": "noun", "pl": "houses", "dg": "n", "sy": "home (as a place where you live)"}, "morning": {"p": "noun", "pl": "mornings", "dg": "m", "an": "night"}, "night": {"p": "noun", "pl": "nights", "dg": "f", "an": "day"}, "today": {"p": "adverb", "nt": "Today means this day, not tonight."}, "tomorrow": {"p": "adverb", "nt": "Tomorrow means the day after today."}, "one": {"p": "number"}, "two": {"p": "number"}, "three": {"p": "number"}, "good": {"p": "adjective", "an": "bad", "nt": "'Good' describes a noun. For how you do something, use 'well'.", "mi": "Do not say 'I speak good'. Say 'I speak well'."}, "school": {"p": "noun", "pl": "schools", "dg": "f"}, "teacher": {"p": "noun", "pl": "teachers", "dg": "m"}, "book": {"p": "noun", "pl": "books", "dg": "n"}, "train": {"p": "noun", "pl": "trains", "dg": "m"}, "station": {"p": "noun", "pl": "stations", "dg": "m"}, "hotel": {"p": "noun", "pl": "hotels", "dg": "n"}, "restaurant": {"p": "noun", "pl": "restaurants", "dg": "n"}, "market": {"p": "noun", "pl": "markets", "dg": "m"}, "money": {"p": "noun", "dg": "n", "nt": "Money has no plural. Do not say 'moneys'."}, "work": {"p": "noun", "dg": "f", "nt": "As a noun for jobs in general, 'work' has no plural."}, "time": {"p": "noun", "dg": "f", "nt": "'Time' for hours and minutes has no plural in general use."}, "day": {"p": "noun", "pl": "days", "dg": "m"}, "week": {"p": "noun", "pl": "weeks", "dg": "f"}, "city": {"p": "noun", "pl": "cities", "dg": "f"}, "street": {"p": "noun", "pl": "streets", "dg": "f"}, "shop": {"p": "noun", "pl": "shops", "dg": "n"}, "telephone": {"p": "noun", "pl": "telephones", "dg": "n", "sy": "phone"}, "doctor": {"p": "noun", "pl": "doctors", "dg": "m"}, "rain": {"p": "noun", "dg": "m", "nt": "Rain has no plural in general use."}, "sun": {"p": "noun", "dg": "f", "nt": "The sun is unique, so it usually takes 'the'."}, "culture": {"p": "noun", "pl": "cultures", "dg": "f"}, "language": {"p": "noun", "pl": "languages", "dg": "f"}, "travel": {"p": "noun", "dg": "f", "nt": "As a general activity, 'travel' has no plural."}, "music": {"p": "noun", "dg": "f", "nt": "Music has no plural in general use."}, "movie": {"p": "noun", "pl": "movies", "dg": "m", "sy": "film"}, "sport": {"p": "noun", "pl": "sports", "dg": "m"}, "health": {"p": "noun", "dg": "f", "nt": "Health has no plural in general use."}, "environment": {"p": "noun", "pl": "environments", "dg": "f"}, "news": {"p": "noun", "nt": "News looks plural but takes a singular verb: 'The news is good'."}, "opinion": {"p": "noun", "pl": "opinions", "dg": "f"}, "happy": {"p": "adjective", "an": "sad", "nt": "Use 'happy' for a feeling. 'I am happy' describes you, not a thing you do."}, "important": {"p": "adjective", "an": "unimportant", "sy": "significant"}, "different": {"p": "adjective", "an": "same"}, "beautiful": {"p": "adjective", "sy": "pretty, lovely", "an": "ugly"}, "interesting": {"p": "adjective", "an": "boring"}, "difficult": {"p": "adjective", "an": "easy"}, "easy": {"p": "adjective", "an": "difficult", "sy": "simple"}, "future": {"p": "noun", "pl": "futures", "dg": "f"}, "history": {"p": "noun", "pl": "histories", "dg": "f"}, "education": {"p": "noun", "dg": "f", "nt": "Education has no plural in general use."}, "discussion": {"p": "noun", "pl": "discussions", "dg": "f"}, "decision": {"p": "noun", "pl": "decisions", "dg": "f"}, "experience": {"p": "noun", "pl": "experiences", "dg": "f"}, "success": {"p": "noun", "pl": "successes", "dg": "m", "an": "failure"}, "responsibility": {"p": "noun", "pl": "responsibilities", "dg": "f"}, "economy": {"p": "noun", "pl": "economies", "dg": "f"}, "government": {"p": "noun", "pl": "governments", "dg": "f"}, "society": {"p": "noun", "pl": "societies", "dg": "f"}, "technology": {"p": "noun", "pl": "technologies", "dg": "f"}, "development": {"p": "noun", "pl": "developments", "dg": "f"}, "advantage": {"p": "noun", "pl": "advantages", "dg": "m", "an": "disadvantage"}, "disadvantage": {"p": "noun", "pl": "disadvantages", "dg": "m", "an": "advantage"}, "solution": {"p": "noun", "pl": "solutions", "dg": "f"}, "problem": {"p": "noun", "pl": "problems", "dg": "n"}, "research": {"p": "noun", "dg": "f", "nt": "Research has no plural in general use."}, "professional": {"p": "adjective", "nt": "Use 'professional' for work done to a high standard, not only for paid work."}, "meeting": {"p": "noun", "pl": "meetings", "dg": "f"}, "project": {"p": "noun", "pl": "projects", "dg": "n"}, "quality": {"p": "noun", "pl": "qualities", "dg": "f"}, "communication": {"p": "noun", "pl": "communications", "dg": "f"}, "analysis": {"p": "noun", "pl": "analyses", "dg": "f"}, "theory": {"p": "noun", "pl": "theories", "dg": "f"}, "hypothesis": {"p": "noun", "pl": "hypotheses", "dg": "f"}, "evidence": {"p": "noun", "dg": "m", "nt": "Evidence has no plural in general use."}, "perspective": {"p": "noun", "pl": "perspectives", "dg": "f"}, "consequence": {"p": "noun", "pl": "consequences", "dg": "f"}, "significant": {"p": "adjective", "sy": "important"}, "fundamental": {"p": "adjective", "sy": "basic"}, "approach": {"p": "noun", "pl": "approaches", "dg": "m"}, "concept": {"p": "noun", "pl": "concepts", "dg": "m"}, "phenomenon": {"p": "noun", "pl": "phenomena", "dg": "n"}, "relationship": {"p": "noun", "pl": "relationships", "dg": "f"}, "assumption": {"p": "noun", "pl": "assumptions", "dg": "f"}, "interpretation": {"p": "noun", "pl": "interpretations", "dg": "f"}, "critical": {"p": "adjective", "nt": "'Critical' can mean very important, or it can mean judging strictly. The meaning depends on context."}, "global": {"p": "adjective", "an": "local"}, "sustainable": {"p": "adjective", "an": "unsustainable"}, "innovation": {"p": "noun", "pl": "innovations", "dg": "f"}, "diversity": {"p": "noun", "dg": "f", "nt": "Diversity has no plural in general use."}, "democracy": {"p": "noun", "pl": "democracies", "dg": "f"}, "nuance": {"p": "noun", "pl": "nuances", "dg": "f"}, "idiom": {"p": "noun", "pl": "idioms", "dg": "f"}, "irony": {"p": "noun", "dg": "f", "nt": "Irony has no plural in general use."}, "eloquence": {"p": "noun", "dg": "f", "nt": "Eloquence has no plural in general use."}, "ambiguity": {"p": "noun", "pl": "ambiguities", "dg": "f"}, "paradox": {"p": "noun", "pl": "paradoxes", "dg": "n"}, "subtle": {"p": "adjective", "nt": "Use 'subtle' for a difference that is small and easy to miss."}, "profound": {"p": "adjective", "sy": "deep"}, "heritage": {"p": "noun", "dg": "n", "nt": "Heritage has no plural in general use."}, "wisdom": {"p": "noun", "dg": "f", "nt": "Wisdom has no plural in general use."}, "integrity": {"p": "noun", "dg": "f", "nt": "Integrity has no plural in general use."}, "resilience": {"p": "noun", "dg": "f", "nt": "Resilience has no plural in general use."}, "empathy": {"p": "noun", "dg": "f", "nt": "Empathy has no plural in general use."}, "diplomacy": {"p": "noun", "dg": "f", "nt": "Diplomacy has no plural in general use."}, "rhetoric": {"p": "noun", "dg": "f", "nt": "Rhetoric has no plural in general use."}, "legacy": {"p": "noun", "pl": "legacies", "dg": "n"}, "contemplation": {"p": "noun", "dg": "f", "nt": "Contemplation has no plural in general use."}, "authenticity": {"p": "noun", "dg": "f", "nt": "Authenticity has no plural in general use."}, "serenity": {"p": "noun", "dg": "f", "nt": "Serenity has no plural in general use."}, "perseverance": {"p": "noun", "dg": "f", "nt": "Perseverance has no plural in general use."}};
+var STORIES = {"en": {"A1": {"title": "A Good Day", "sentences": ["Hello! I am a student.", "I learn a new language every day.", "My friend likes good food and clean water.", "Today is a good day.", "My mother likes good food.", "My father has a house.", "My friend is happy today.", "Good night, my friend.", "This is hello.", "This is thank you."]}, "A2": {"title": "A Day in the City", "sentences": ["I go to school by train in the morning.", "At the market, I buy food and drink.", "My teacher has many books about the city.", "It rains in the evening, but the sun shines in the morning.", "My teacher has a book.", "The train goes to the city.", "I buy food at the market.", "The doctor works at the hotel today.", "This is school.", "This is teacher."]}, "B1": {"title": "Culture and Travel", "sentences": ["I think culture and language are important for travel.", "Music and film help us understand other people.", "In my opinion, education changes the future.", "A difficult journey can become an interesting story.", "Music is important in my culture.", "My opinion is different, but my friend is happy.", "A beautiful journey is easy to remember.", "In my opinion, history is an important subject.", "This is culture.", "This is language."]}, "B2": {"title": "Work and Success", "sentences": ["Experience is important for success in professional life.", "Technology changes society, and governments must find good solutions.", "Every project has advantages and disadvantages.", "Good communication helps a team solve a difficult problem.", "A good discussion needs a good question.", "The project was successful because the team worked well.", "Technology changes society and the economy.", "A professional team solves a problem together.", "This is discussion.", "This is decision."]}, "C1": {"title": "Ideas and Evidence", "sentences": ["Analysis requires evidence, and theory must be tested in practice.", "A fundamental concept connects perspective and interpretation.", "The consequences of innovation are global and significant.", "Diversity and democracy support a sustainable society.", "The analysis shows a significant consequence.", "A theory needs evidence and a clear concept.", "Innovation is fundamental to a global economy.", "Diversity and democracy need critical thinking.", "This is analysis.", "This is theory."]}, "C2": {"title": "Words and Wisdom", "sentences": ["Language has nuance, and a single word can carry irony.", "Wisdom grows from experience, and integrity guides difficult choices.", "Heritage and legacy shape how a culture understands itself.", "Perseverance and serenity often live in the same person.", "Nuance and irony shape the meaning of a sentence.", "The paradox of eloquence is that silence can speak.", "Authenticity and integrity build a lasting legacy.", "Wisdom grows from experience and contemplation.", "This is nuance.", "This is idiom."]}}, "zh": {"A1": {"title": "A Good Day", "sentences": ["你好！我是一名学生。", "我每天学习一门新语言。", "我的朋友喜欢好吃的食物和干净的水。", "今天是美好的一天。", "我妈妈喜欢好吃的食物。", "我爸爸有一栋房子。", "我的朋友今天很开心。", "晚安，我的朋友。", "这是你好。", "这是谢谢。"]}, "A2": {"title": "A Day in the City", "sentences": ["我早上坐火车去学校。", "在市场，我买食物和饮料。", "我的老师有很多关于城市的书。", "晚上会下雨，但早上阳光明媚。", "我的老师有一本书。", "火车去城市。", "我在市场买食物。", "医生今天在酒店工作。", "这是学校。", "这是老师。"]}, "B1": {"title": "Culture and Travel", "sentences": ["我认为文化和语言对旅行很重要。", "音乐和电影帮助我们了解他人。", "在我看来，教育改变未来。", "一次艰难的旅行可以成为一个有趣的故事。", "音乐在我的文化中很重要。", "我的意见不同，但我的朋友很开心。", "一次美丽的旅行很容易记住。", "在我看来，历史是一门重要的学科。", "这是文化。", "这是语言。"]}, "B2": {"title": "Work and Success", "sentences": ["经验对职业生涯的成功很重要。", "技术改变社会，政府必须找到好的解决办法。", "每个项目都有优点和缺点。", "良好的交流帮助团队解决难题。", "好的讨论需要一个好问题。", "这个项目很成功，因为团队工作得很好。", "技术改变社会和经济。", "专业的团队一起解决问题。", "这是讨论。", "这是决定。"]}, "C1": {"title": "Ideas and Evidence", "sentences": ["分析需要证据，理论必须在实践中检验。", "一个基本概念连接着观点和解释。", "创新的后果是全球性的，也是重大的。", "多样性和民主支持可持续的社会。", "分析显示了一个重要的结果。", "一个理论需要证据和清晰的概念。", "创新对全球经济至关重要。", "多样性和民主需要批判性思维。", "这是分析。", "这是理论。"]}, "C2": {"title": "Words and Wisdom", "sentences": ["语言有细微差别，一个词可以带有讽刺意味。", "智慧来自经验，正直指引艰难的选择。", "遗产塑造了一个文化如何理解自身。", "毅力和宁静常常存在于同一个人身上。", "细微差别和反讽塑造句子的含义。", "雄辩的悖论在于沉默也可以说话。", "真实和正直成就持久的遗产。", "智慧来自经验和沉思。", "这是细微差别。", "这是习语。"]}}, "my": {"A1": {"title": "A Good Day", "sentences": ["မင်္ဂလာပါ။ ကျွန်တော်က ကျောင်းသားပါ။", "ကျွန်တော်က နေ့တိုင်း ဘာသာစကားအသစ်တစ်ခုကို သင်ယူပါတယ်။", "ကျွန်တော့်သူငယ်ချင်းက အစားအစာကောင်းနဲ့ ရေသန့်ကို ကြိုက်ပါတယ်။", "ဒီနေ့ဟာ နေ့ကောင်းတစ်နေ့ပါ။", "ကျွန်တော့်အမေက ကောင်းတဲ့အစားအစာကို ကြိုက်ပါတယ်။", "ကျွန်တော့်အဖေမှာ အိမ်တစ်လုံးရှိပါတယ်။", "ကျွန်တော့်သူငယ်ချင်းက ဒီနေ့ပျော်ရွှင်ပါတယ်။", "ကောင်းသောည ဖြစ်ပါစေ၊ သူငယ်ချင်း။", "ဒါက မင်္ဂလာပါ ပါ။", "ဒါက ကျေးဇူးတင်ပါတယ် ပါ။"]}, "A2": {"title": "A Day in the City", "sentences": ["ကျွန်တော်က မနက်မှာ ရထားနဲ့ ကျောင်းသွားပါတယ်။", "ဈေးမှာ ကျွန်တော်က အစားအစာနဲ့ အဖျော်ယမကာတွေ ဝယ်ပါတယ်။", "ကျွန်တော့်ဆရာမှာ မြို့နဲ့ပတ်သက်တဲ့ စာအုပ်တွေအများကြီးရှိပါတယ်။", "ညနေမှာ မိုးရွာပေမယ့် မနက်မှာ နေသာပါတယ်။", "ကျွန်တော့်ဆရာမှာ စာအုပ်တစ်အုပ်ရှိပါတယ်။", "ရထားက မြို့ထဲကို သွားပါတယ်။", "ကျွန်တော်က စျေးမှာ အစားအစာကို ဝယ်ပါတယ်။", "ဆရာဝန်က ဒီနေ့ဟိုတယ်မှာ အလုပ်လုပ်ပါတယ်။", "ဒါက ကျောင်း ပါ။", "ဒါက ဆရာ ပါ။"]}, "B1": {"title": "Culture and Travel", "sentences": ["ယဉ်ကျေးမှုနဲ့ ဘာသာစကားဟာ ခရီးသွားခြင်းအတွက် အရေးကြီးတယ်လို့ ကျွန်တော်ထင်ပါတယ်။", "ဂီတနဲ့ ရုပ်ရှင်တွေက တခြားသူတွေကို နားလည်ဖို့ ကူညီပါတယ်။", "ကျွန်တော့်အမြင်မှာ ပညာရေးက အနာဂတ်ကို ပြောင်းလဲစေပါတယ်။", "ခက်ခဲတဲ့ ခရီးတစ်ခုဟာ စိတ်ဝင်စားစရာဇာတ်လမ်းတစ်ပုဒ် ဖြစ်လာနိုင်ပါတယ်။", "ဂီတက ကျွန်တော့်ယဉ်ကျေးမှုမှာ အရေးကြီးပါတယ်။", "ကျွန်တော့်အမြင်က မတူပေမယ့် ကျွန်တော့်သူငယ်ချင်းက ပျော်ရွှင်ပါတယ်။", "လှပတဲ့ခရီးတစ်ခုကို မှတ်မိဖို့ လွယ်ပါတယ်။", "ကျွန်တော့်အမြင်မှာ သမိုင်းက အရေးကြီးတဲ့ ဘာသာရပ်တစ်ခု ဖြစ်ပါတယ်။", "ဒါက ယဉ်ကျေးမှု ပါ။", "ဒါက ဘာသာစကား ပါ။"]}, "B2": {"title": "Work and Success", "sentences": ["အတွေ့အကြုံဟာ အသက်မွေးဝမ်းကျောင်းဘဝမှာ အောင်မြင်ဖို့အတွက် အရေးကြီးပါတယ်။", "နည်းပညာက လူ့အဖွဲ့အစည်းကို ပြောင်းလဲစေပြီး အစိုးရတွေက ကောင်းမွန်တဲ့ ဖြေရှင်းချက်တွေကို ရှာရပါမယ်။", "စီမံကိန်းတိုင်းမှာ အားသာချက်တွေနဲ့ အားနည်းချက်တွေ ရှိပါတယ်။", "ကောင်းမွန်တဲ့ ဆက်သွယ်ရေးက အဖွဲ့တစ်ဖွဲ့ကို ခက်ခဲတဲ့ ပြဿနာတစ်ခု ဖြေရှင်းဖို့ ကူညီပါတယ်။", "ကောင်းတဲ့ဆွေးနွေးမှုတစ်ခုမှာ ကောင်းတဲ့မေးခွန်းတစ်ခု လိုအပ်ပါတယ်။", "အသင်းက ကောင်းကောင်းအလုပ်လုပ်ခဲ့လို့ ဒီစီမံကိန်းက အောင်မြင်ခဲ့ပါတယ်။", "နည်းပညာက လူ့အဖွဲ့အစည်းနဲ့ စီးပွားရေးကို ပြောင်းလဲစေပါတယ်။", "ကျွမ်းကျင်တဲ့အသင်းက ပြဿနာတစ်ခုကို အတူတကွ ဖြေရှင်းပါတယ်။", "ဒါက ဆွေးနွေး ပါ။", "ဒါက ဆုံးဖြတ်ချက် ပါ။"]}, "C1": {"title": "Ideas and Evidence", "sentences": ["ခွဲခြမ်းစိတ်ဖြာမှုမှာ အထောက်အထားတွေ လိုအပ်ပြီး သီအိုရီကို လက်တွေ့မှာ စမ်းသပ်ရပါမယ်။", "အခြေခံအယူအဆတစ်ခုက အမြင်ရှုထောင့်နဲ့ အဓိပ္ပာယ်ဖွင့်ဆိုချက်ကို ဆက်စပ်ပေးပါတယ်။", "ဆန်းသစ်တီထွင်မှုရဲ့ အကျိုးဆက်တွေက ကမ္ဘာလုံးဆိုင်ရာဖြစ်ပြီး အရေးပါပါတယ်။", "ကွဲပြားခြားနားမှုနဲ့ ဒီမိုကရေစီက ရေရှည်တည်တံ့တဲ့ လူ့အဖွဲ့အစည်းကို ထောက်ပံ့ပါတယ်။", "သုံးသပ်ချက်က သိသာတဲ့အကျိုးဆက်တစ်ခုကို ပြသပါတယ်။", "သီအိုရီတစ်ခုမှာ အထောက်အထားနဲ့ ရှင်းလင်းတဲ့သဘောတရား လိုအပ်ပါတယ်။", "ဆန်းသစ်တီထွင်မှုက ကမ္ဘာ့စီးပွားရေးအတွက် အခြေခံအရေးကြီးပါတယ်။", "မတူကွဲပြားမှုနဲ့ ဒီမိုကရေစီမှာ ဝေဖန်ပိုင်းခြားတဲ့အတွေးအခေါ် လိုအပ်ပါတယ်။", "ဒါက ခွဲခြမ်းစိတ်ဖြာ ပါ။", "ဒါက သီအိုရီ ပါ။"]}, "C2": {"title": "Words and Wisdom", "sentences": ["ဘာသာစကားမှာ အသေးစိတ်ကွဲပြားမှုတွေ ရှိပြီး စကားလုံးတစ်လုံးက သရော်မှုကို သယ်ဆောင်နိုင်ပါတယ်။", "ပညာဟာ အတွေ့အကြုံမှ ကြီးထွားလာပြီး ရိုးသားမှုက ခက်ခဲတဲ့ ရွေးချယ်မှုတွေကို လမ်းညွှန်ပါတယ်။", "အမွေအနှစ်တွေက ယဉ်ကျေးမှုတစ်ခုက သူ့ကိုယ်သူ ဘယ်လိုနားလည်တယ်ဆိုတာကို ပုံဖော်ပါတယ်။", "ဇွဲနဲ့ ငြိမ်းချမ်းမှုတွေဟာ မကြာခဏ လူတစ်ယောက်တည်းမှာ အတူရှိနေတတ်ပါတယ်။", "သိမ်မွေ့တဲ့ကွာခြားချက်နဲ့ သရော်မှုက ဝါကျတစ်ခုရဲ့ အဓိပ္ပါယ်ကို ပုံဖော်ပါတယ်။", "စစ်မှန်မှုနဲ့ ရိုးသားမှုက တည်တံ့တဲ့အမွေအနှစ်ကို တည်ဆောက်ပါတယ်။", "ပညာက အတွေ့အကြုံနဲ့ ဆင်ခြင်တွေးတောမှုကနေ ကြီးထွားလာပါတယ်။", "ဒါက အသေးစိတ်ကွဲပြားမှု ပါ။", "ဒါက အီဒီယမ် ပါ။", "ဒါက သရော် ပါ။"]}}, "de": {"A1": {"title": "A Good Day", "sentences": ["Hallo! Ich bin Student.", "Ich lerne jeden Tag eine neue Sprache.", "Mein Freund mag gutes Essen und sauberes Wasser.", "Heute ist ein guter Tag.", "Meine Mutter mag gutes Essen.", "Mein Vater hat ein Haus.", "Mein Freund ist heute glücklich.", "Gute Nacht, mein Freund.", "Das ist Hallo.", "Das ist Danke."]}, "A2": {"title": "A Day in the City", "sentences": ["Ich fahre morgens mit dem Zug zur Schule.", "Auf dem Markt kaufe ich Essen und Getränke.", "Mein Lehrer hat viele Bücher über die Stadt.", "Abends regnet es, aber morgens scheint die Sonne.", "Mein Lehrer hat ein Buch.", "Der Zug fährt in die Stadt.", "Ich kaufe Essen auf dem Markt.", "Der Arzt arbeitet heute im Hotel.", "Das ist Schule.", "Das ist Lehrer."]}, "B1": {"title": "Culture and Travel", "sentences": ["Ich denke, Kultur und Sprache sind für Reisen wichtig.", "Musik und Film helfen uns, andere Menschen zu verstehen.", "Meiner Meinung nach verändert Bildung die Zukunft.", "Eine schwierige Reise kann eine interessante Geschichte werden.", "Musik ist in meiner Kultur wichtig.", "Meine Meinung ist anders, aber mein Freund ist glücklich.", "Eine schöne Reise ist leicht zu erinnern.", "Meiner Meinung nach ist Geschichte ein wichtiges Fach.", "Das ist Kultur.", "Das ist Sprache."]}, "B2": {"title": "Work and Success", "sentences": ["Erfahrung ist wichtig für den Erfolg im Berufsleben.", "Technik verändert die Gesellschaft, und Regierungen müssen gute Lösungen finden.", "Jedes Projekt hat Vorteile und Nachteile.", "Gute Kommunikation hilft einem Team, ein schwieriges Problem zu lösen.", "Eine gute Diskussion braucht eine gute Frage.", "Das Projekt war erfolgreich, weil das Team gut gearbeitet hat.", "Technologie verändert die Gesellschaft und die Wirtschaft.", "Ein professionelles Team löst ein Problem gemeinsam.", "Das ist Diskussion.", "Das ist Entscheidung."]}, "C1": {"title": "Ideas and Evidence", "sentences": ["Analyse braucht Beweise, und Theorie muss in der Praxis geprüft werden.", "Ein grundlegender Begriff verbindet Perspektive und Interpretation.", "Die Folgen von Innovation sind global und bedeutend.", "Vielfalt und Demokratie stützen eine nachhaltige Gesellschaft.", "Die Analyse zeigt eine bedeutende Folge.", "Eine Theorie braucht Beweise und ein klares Konzept.", "Innovation ist für eine globale Wirtschaft grundlegend.", "Vielfalt und Demokratie brauchen kritisches Denken.", "Das ist Analyse.", "Das ist Theorie."]}, "C2": {"title": "Words and Wisdom", "sentences": ["Sprache hat Nuancen, und ein einziges Wort kann Ironie tragen.", "Weisheit wächst aus Erfahrung, und Integrität leitet schwierige Entscheidungen.", "Erbe und Vermächtnis prägen, wie eine Kultur sich selbst versteht.", "Ausdauer und Gelassenheit leben oft in derselben Person.", "Nuancen und Ironie prägen die Bedeutung eines Satzes.", "Das Paradox der Eloquenz ist, dass Schweigen sprechen kann.", "Authentizität und Integrität bauen ein dauerhaftes Vermächtnis auf.", "Weisheit wächst aus Erfahrung und Betrachtung.", "Das ist Nuance.", "Das ist Redewendung."]}}, "fr": {"A1": {"title": "A Good Day", "sentences": ["Bonjour ! Je suis étudiant.", "J'apprends une nouvelle langue chaque jour.", "Mon ami aime la bonne nourriture et l'eau propre.", "Aujourd'hui est un beau jour.", "Ma mère aime la bonne nourriture.", "Mon père a une maison.", "Mon ami est heureux aujourd'hui.", "Bonne nuit, mon ami.", "C'est Bonjour.", "C'est Merci."]}, "A2": {"title": "A Day in the City", "sentences": ["Je vais à l'école en train le matin.", "Au marché, j'achète de la nourriture et des boissons.", "Mon enseignant a beaucoup de livres sur la ville.", "Il pleut le soir, mais le soleil brille le matin.", "Mon professeur a un livre.", "Le train va à la ville.", "J'achète de la nourriture au marché.", "Le médecin travaille à l'hôtel aujourd'hui.", "C'est École.", "C'est Enseignant."]}, "B1": {"title": "Culture and Travel", "sentences": ["Je pense que la culture et la langue sont importantes pour le voyage.", "La musique et le cinéma nous aident à comprendre les autres.", "À mon avis, l'éducation change l'avenir.", "Un voyage difficile peut devenir une histoire intéressante.", "La musique est importante dans ma culture.", "Mon opinion est différente, mais mon ami est heureux.", "Un beau voyage est facile à retenir.", "À mon avis, l'histoire est une matière importante.", "C'est Culture.", "C'est Langue."]}, "B2": {"title": "Work and Success", "sentences": ["L'expérience est importante pour réussir dans la vie professionnelle.", "La technologie change la société, et les gouvernements doivent trouver de bonnes solutions.", "Chaque projet a des avantages et des inconvénients.", "Une bonne communication aide une équipe à résoudre un problème difficile.", "Une bonne discussion a besoin d'une bonne question.", "Le projet a réussi parce que l'équipe a bien travaillé.", "La technologie change la société et l'économie.", "Une équipe professionnelle résout un problème ensemble.", "C'est Discussion.", "C'est Décision."]}, "C1": {"title": "Ideas and Evidence", "sentences": ["L'analyse exige des preuves, et la théorie doit être testée en pratique.", "Un concept fondamental relie la perspective et l'interprétation.", "Les conséquences de l'innovation sont mondiales et significatives.", "La diversité et la démocratie soutiennent une société durable.", "L'analyse montre une conséquence importante.", "Une théorie a besoin de preuves et d'un concept clair.", "L'innovation est fondamentale pour une économie mondiale.", "La diversité et la démocratie ont besoin d'esprit critique.", "C'est Analyse.", "C'est Théorie."]}, "C2": {"title": "Words and Wisdom", "sentences": ["La langue a des nuances, et un seul mot peut porter l'ironie.", "La sagesse naît de l'expérience, et l'intégrité guide les choix difficiles.", "Le patrimoine et l'héritage façonnent la façon dont une culture se comprend.", "La persévérance et la sérénité vivent souvent chez la même personne.", "La nuance et l'ironie façonnent le sens d'une phrase.", "Le paradoxe de l'éloquence est que le silence peut parler.", "L'authenticité et l'intégrité construisent un héritage durable.", "La sagesse grandit grâce à l'expérience et à la contemplation.", "C'est Nuance.", "C'est Idiotisme."]}}, "ko": {"A1": {"title": "A Good Day", "sentences": ["안녕하세요! 저는 학생입니다.", "저는 매일 새로운 언어를 배웁니다.", "제 친구는 좋은 음식과 깨끗한 물을 좋아합니다.", "오늘은 좋은 날입니다.", "제 어머니는 맛있는 음식을 좋아합니다.", "제 아버지는 집이 있습니다.", "제 친구는 오늘 행복합니다.", "잘 자요, 친구야.", "이것은 안녕하세요입니다.", "이것은 감사합니다입니다."]}, "A2": {"title": "A Day in the City", "sentences": ["저는 아침에 기차로 학교에 갑니다.", "시장에서 저는 음식과 음료를 삽니다.", "제 선생님은 도시에 관한 책이 많습니다.", "저녁에는 비가 오지만 아침에는 해가 빛납니다.", "제 선생님은 책이 있습니다.", "기차는 도시로 갑니다.", "저는 시장에서 음식을 삽니다.", "의사는 오늘 호텔에서 일합니다.", "이것은 학교입니다.", "이것은 선생님입니다."]}, "B1": {"title": "Culture and Travel", "sentences": ["저는 문화와 언어가 여행에 중요하다고 생각합니다.", "음악과 영화는 다른 사람들을 이해하는 데 도움이 됩니다.", "제 생각에는 교육이 미래를 바꿉니다.", "어려운 여행은 흥미로운 이야기가 될 수 있습니다.", "음악은 제 문화에서 중요합니다.", "제 의견은 다르지만, 제 친구는 행복합니다.", "아름다운 여행은 기억하기 쉽습니다.", "제 생각에 역사는 중요한 과목입니다.", "이것은 문화입니다.", "이것은 언어입니다."]}, "B2": {"title": "Work and Success", "sentences": ["경험은 직업 생활에서의 성공에 중요합니다.", "기술은 사회를 변화시키고, 정부는 좋은 해결책을 찾아야 합니다.", "모든 프로젝트에는 장점과 단점이 있습니다.", "좋은 소통은 팀이 어려운 문제를 해결하는 데 도움이 됩니다.", "좋은 토론에는 좋은 질문이 필요합니다.", "팀이 잘 일했기 때문에 프로젝트가 성공했습니다.", "기술은 사회와 경제를 변화시킵니다.", "전문적인 팀은 문제를 함께 해결합니다.", "이것은 토론입니다.", "이것은 결정입니다."]}, "C1": {"title": "Ideas and Evidence", "sentences": ["분석에는 증거가 필요하고, 이론은 실제로 검증되어야 합니다.", "기본적인 개념은 관점과 해석을 연결합니다.", "혁신의 결과는 전 세계적이며 중요합니다.", "다양성과 민주주의는 지속 가능한 사회를 뒷받침합니다.", "분석은 중요한 결과를 보여줍니다.", "이론에는 증거와 명확한 개념이 필요합니다.", "혁신은 세계 경제에 기본적입니다.", "다양성과 민주주의에는 비판적 사고가 필요합니다.", "이것은 분석입니다.", "이것은 이론입니다."]}, "C2": {"title": "Words and Wisdom", "sentences": ["언어에는 뉘앙스가 있고, 한 단어가 아이러니를 담을 수 있습니다.", "지혜는 경험에서 자라고, 청렴은 어려운 선택을 이끕니다.", "유산은 문화가 자신을 이해하는 방식을 형성합니다.", "인내와 평온은 종종 같은 사람 안에 공존합니다.", "뉘앙스와 아이러니는 문장의 의미를 형성합니다.", "웅변의 역설은 침묵도 말할 수 있다는 것이다.", "진정성과 정직성은 오래가는 유산을 만듭니다.", "지혜는 경험과 명상에서 자랍니다.", "이것은 뉘앙스입니다.", "이것은 관용구입니다."]}}, "ja": {"A1": {"title": "A Good Day", "sentences": ["こんにちは！私は学生です。", "私は毎日新しい言語を学びます。", "私の友達はおいしい食べ物ときれいな水が好きです。", "今日は良い日です。", "私の母はおいしい食べ物が好きです。", "私の父は家を持っています。", "私の友達は今日幸せです。", "おやすみなさい、友達。", "これはこんにちはです。", "これはありがとうございますです。"]}, "A2": {"title": "A Day in the City", "sentences": ["私は朝電車で学校に行きます。", "市場で、私は食べ物と飲み物を買います。", "私の先生は都市についての本をたくさん持っています。", "夕方は雨が降りますが、朝は太陽が輝きます。", "私の先生は本を持っています。", "電車は街へ行きます。", "私は市場で食べ物を買います。", "医者は今日ホテルで働いています。", "これは学校です。", "これは先生です。"]}, "B1": {"title": "Culture and Travel", "sentences": ["文化と言語は旅行にとって重要だと思います。", "音楽と映画は他の人々を理解するのに役立ちます。", "私の意見では、教育は未来を変えます。", "難しい旅は面白い話になることがあります。", "音楽は私の文化で重要です。", "私の意見は違いますが、友達は幸せです。", "美しい旅は覚えやすいです。", "私の意見では、歴史は重要な科目です。", "これは文化です。", "これは言語です。"]}, "B2": {"title": "Work and Success", "sentences": ["経験は職業生活での成功に重要です。", "技術は社会を変え、政府は良い解決策を見つけなければなりません。", "すべてのプロジェクトには利点と欠点があります。", "良いコミュニケーションはチームが難しい問題を解決するのに役立ちます。", "良い議論には良い質問が必要です。", "チームがよく働いたので、プロジェクトは成功しました。", "技術は社会と経済を変えます。", "プロのチームは問題を一緒に解決します。", "これは討論です。", "これは決定です。"]}, "C1": {"title": "Ideas and Evidence", "sentences": ["分析には証拠が必要であり、理論は実践で検証されなければなりません。", "基本的な概念は観点と解釈を結びつけます。", "革新の結果は世界的であり重要です。", "多様性と民主主義は持続可能な社会を支えます。", "分析は重要な結果を示しています。", "理論には証拠と明確な概念が必要です。", "イノベーションは世界経済にとって基本的です。", "多様性と民主主義には批判的思考が必要です。", "これは分析です。", "これは理論です。"]}, "C2": {"title": "Words and Wisdom", "sentences": ["言語にはニュアンスがあり、一つの言葉が皮肉を含むことがあります。", "知恵は経験から育ち、誠実さは難しい選択を導きます。", "遺産は文化が自分自身を理解する方法を形作ります。", "忍耐と静寂はしばしば同じ人の中に共存します。", "ニュアンスと皮肉は文の意味を形作ります。", "雄弁の逆説は、沈黙も語ることができるということです。", "真正性と誠実さは永続的な遺産を築きます。", "知恵は経験と思索から育ちます。", "これはニュアンスです。", "これは慣用句です。"]}}, "es": {"A1": {"title": "A Good Day", "sentences": ["¡Hola! Soy estudiante.", "Aprendo un idioma nuevo cada día.", "A mi amigo le gusta la buena comida y el agua limpia.", "Hoy es un buen día.", "A mi madre le gusta la buena comida.", "Mi padre tiene una casa.", "Mi amigo está feliz hoy.", "Buenas noches, amigo mío.", "Esto es Hola.", "Esto es Gracias."]}, "A2": {"title": "A Day in the City", "sentences": ["Voy a la escuela en tren por la mañana.", "En el mercado, compro comida y bebida.", "Mi profesor tiene muchos libros sobre la ciudad.", "Llueve por la tarde, pero el sol brilla por la mañana.", "Mi profesor tiene un libro.", "El tren va a la ciudad.", "Compro comida en el mercado.", "El médico trabaja hoy en el hotel.", "Esto es Escuela.", "Esto es Profesor."]}, "B1": {"title": "Culture and Travel", "sentences": ["Creo que la cultura y el idioma son importantes para viajar.", "La música y el cine nos ayudan a entender a otras personas.", "En mi opinión, la educación cambia el futuro.", "Un viaje difícil puede convertirse en una historia interesante.", "La música es importante en mi cultura.", "Mi opinión es diferente, pero mi amigo está feliz.", "Un viaje hermoso es fácil de recordar.", "En mi opinión, la historia es una asignatura importante.", "Esto es Cultura.", "Esto es Idioma."]}, "B2": {"title": "Work and Success", "sentences": ["La experiencia es importante para el éxito en la vida profesional.", "La tecnología cambia la sociedad, y los gobiernos deben encontrar buenas soluciones.", "Cada proyecto tiene ventajas y desventajas.", "Una buena comunicación ayuda a un equipo a resolver un problema difícil.", "Una buena discusión necesita una buena pregunta.", "El proyecto tuvo éxito porque el equipo trabajó bien.", "La tecnología cambia la sociedad y la economía.", "Un equipo profesional resuelve un problema juntos.", "Esto es Debate.", "Esto es Decisión."]}, "C1": {"title": "Ideas and Evidence", "sentences": ["El análisis requiere pruebas, y la teoría debe probarse en la práctica.", "Un concepto fundamental conecta la perspectiva y la interpretación.", "Las consecuencias de la innovación son globales y significativas.", "La diversidad y la democracia sostienen una sociedad sostenible.", "El análisis muestra una consecuencia significativa.", "Una teoría necesita evidencia y un concepto claro.", "La innovación es fundamental para una economía global.", "La diversidad y la democracia necesitan pensamiento crítico.", "Esto es Análisis.", "Esto es Teoría."]}, "C2": {"title": "Words and Wisdom", "sentences": ["El idioma tiene matices, y una sola palabra puede llevar ironía.", "La sabiduría crece con la experiencia, y la integridad guía las decisiones difíciles.", "El patrimonio y el legado moldean cómo una cultura se entiende a sí misma.", "La perseverancia y la serenidad a menudo viven en la misma persona.", "El matiz y la ironía dan forma al significado de una frase.", "La paradoja de la elocuencia es que el silencio puede hablar.", "La autenticidad y la integridad construyen un legado duradero.", "La sabiduría crece a partir de la experiencia y la contemplación.", "Esto es Matiz.", "Esto es Modismo."]}}};
+var FREE_RESOURCES = [{"name": "Wiktionary", "url": "https://www.wiktionary.org/", "desc": "A free dictionary in many languages, written by volunteers. Look up words, meanings, and pronunciations.", "lic": "CC BY-SA 4.0 and GFDL"}, {"name": "Tatoeba", "url": "https://tatoeba.org/", "desc": "A large collection of example sentences in many languages, with translations. Good for seeing words used in real sentences.", "lic": "Sentences CC BY 2.0 FR"}, {"name": "Open English WordNet", "url": "https://github.com/globalwordnet/english-wordnet", "desc": "A free English word database with meanings, synonyms, and examples. This app's English dictionary expansion comes from it.", "lic": "CC BY 4.0"}, {"name": "FreeDict", "url": "https://freedict.org/", "desc": "Free bilingual dictionaries in about 45 languages, made for lookup tools and offline use.", "lic": "Free licenses, mostly GPL, check each dictionary"}, {"name": "Leipzig Corpora Collection", "url": "https://corpora.uni-leipzig.de/", "desc": "Word frequency lists and example sentences in over 200 languages, from Leipzig University. Useful for seeing which words are most common.", "lic": "Downloadable corpora CC BY 4.0, live service has separate terms"}, {"name": "Project Gutenberg", "url": "https://www.gutenberg.org/", "desc": "Over 70,000 free ebooks, mostly older books whose copyright has expired. Good for reading practice in English and other languages.", "lic": "Public domain, free to read"}, {"name": "BBC Learning English", "url": "https://www.bbc.co.uk/learningenglish", "desc": "Free English lessons, news stories, and pronunciation practice from the BBC.", "lic": "Free to access, BBC copyright"}];
 var ICON_MARK = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M12 3c2.5 2.6 3.8 5.6 3.8 9S14.5 18.4 12 21c-2.5-2.6-3.8-5.6-3.8-9S9.5 5.6 12 3Z"/><path d="M3.5 9h17M3.5 15h17"/></svg>';
 var LS_KEY = "nes_learn_v1";
 var LEVEL_ORDER = ["A1","A2","B1","B2","C1","C2"];
@@ -204,11 +253,11 @@ function esc(s){return String(s).replace(/&/g,"&amp;").replace(/</g,"&lt;").repl
 function q(s){return "'"+String(s).replace(/'/g,"\\'")+"'";}
 function todayStr(d){d=d||new Date();return d.getFullYear()+"-"+String(d.getMonth()+1).padStart(2,"0")+"-"+String(d.getDate()).padStart(2,"0");}
 function yesterdayStr(){var d=new Date();d.setDate(d.getDate()-1);return todayStr(d);}
-function blankLang(){return {doneLessons:[],examPass:{},examScores:{},testHistory:[],savedWords:[],learnedWords:[],studySeconds:0,lastStudyDate:"",streak:0,activity:{},cert:{},alphaCompleted:0,survey:null,diag:null,diagSkipped:false,placedLevel:null,mastery:null,reviews:{},wordReviews:{}};}
+function blankLang(){return {doneLessons:[],examPass:{},examScores:{},testHistory:[],savedWords:[],learnedWords:[],studySeconds:0,lastStudyDate:"",streak:0,activity:{},cert:{},alphaCompleted:0,survey:null,diag:null,diagSkipped:false,placedLevel:null,mastery:null,reviews:{},wordReviews:{},storiesRead:[]};}
 function defaultState(){var s={v:1,name:"",selected:["en","my"],currentLang:"en",prefs:{theme:"light",dailyGoalMin:20,voice:true},langs:{},recentLangs:[],tutorialDone:false,accepted:false,energy:{v:10,max:10,t:0},surveyGlobal:{goal:"",minutes:20}};Object.keys(LANG_DB).forEach(function(c){s.langs[c]=blankLang();});return s;}
 // ADAPT_SKILLS must be defined before loadState runs, because loadState seeds mastery for older saves.
 var ADAPT_SKILLS=["Vocabulary","Grammar","Reading","Listening","Speaking","Spelling"];
-function loadState(){try{var raw=localStorage.getItem(LS_KEY);if(!raw)return defaultState();var s=JSON.parse(raw);if(!s.langs)s.langs={};Object.keys(LANG_DB).forEach(function(c){if(!s.langs[c])s.langs[c]=blankLang();});if(!s.prefs)s.prefs={theme:"light",dailyGoalMin:20,voice:true};if(typeof s.accepted!=="boolean")s.accepted=false;if(typeof s.tutorialDone!=="boolean")s.tutorialDone=!!s.name;if(!s.energy||typeof s.energy.v!=="number")s.energy={v:10,max:10,t:0};if(typeof s.energy.max!=="number")s.energy.max=10;if(typeof s.energy.t!=="number")s.energy.t=0;if(s.energy.v>s.energy.max)s.energy.v=s.energy.max;if(s.energy.v<0)s.energy.v=0;if(!s.selected||!s.selected.length)s.selected=["en"];if(!s.surveyGlobal)s.surveyGlobal={goal:"",minutes:20};Object.keys(LANG_DB).forEach(function(c){var st=s.langs[c];if(!st.mastery)st.mastery=defaultMastery();if(!st.reviews)st.reviews={};if(!st.wordReviews)st.wordReviews={};if(st.survey===undefined)st.survey=null;if(st.diag===undefined)st.diag=null;if(st.diagSkipped===undefined)st.diagSkipped=false;if(st.placedLevel===undefined)st.placedLevel=null;});return s;}catch(e){return defaultState();}}
+function loadState(){try{var raw=localStorage.getItem(LS_KEY);if(!raw)return defaultState();var s=JSON.parse(raw);if(!s.langs)s.langs={};Object.keys(LANG_DB).forEach(function(c){if(!s.langs[c])s.langs[c]=blankLang();});if(!s.prefs)s.prefs={theme:"light",dailyGoalMin:20,voice:true};if(typeof s.accepted!=="boolean")s.accepted=false;if(typeof s.tutorialDone!=="boolean")s.tutorialDone=!!s.name;if(!s.energy||typeof s.energy.v!=="number")s.energy={v:10,max:10,t:0};if(typeof s.energy.max!=="number")s.energy.max=10;if(typeof s.energy.t!=="number")s.energy.t=0;if(s.energy.v>s.energy.max)s.energy.v=s.energy.max;if(s.energy.v<0)s.energy.v=0;if(!s.selected||!s.selected.length)s.selected=["en"];if(!s.surveyGlobal)s.surveyGlobal={goal:"",minutes:20};Object.keys(LANG_DB).forEach(function(c){var st=s.langs[c];if(!st.mastery)st.mastery=defaultMastery();if(!st.reviews)st.reviews={};if(!st.wordReviews)st.wordReviews={};if(!st.storiesRead)st.storiesRead=[];if(st.survey===undefined)st.survey=null;if(st.diag===undefined)st.diag=null;if(st.diagSkipped===undefined)st.diagSkipped=false;if(st.placedLevel===undefined)st.placedLevel=null;});return s;}catch(e){return defaultState();}}
 var S = loadState();
 function save(){localStorage.setItem(LS_KEY,JSON.stringify(S));applyTheme();}
 var ENERGY_MAX=10,ENERGY_MINUTES=6,ENERGY_MS=360000;
@@ -315,6 +364,30 @@ function ring(pct){
   var c=2*Math.PI*26,off=c*(1-pct/100);
   return '<svg class="ring" viewBox="0 0 64 64" aria-label="'+pct+' percent complete"><circle cx="32" cy="32" r="26" fill="none" stroke="var(--card2)" stroke-width="7"/><circle cx="32" cy="32" r="26" fill="none" stroke="#0D7BFF" stroke-width="7" stroke-linecap="round" stroke-dasharray="'+c+'" stroke-dashoffset="'+off+'" transform="rotate(-90 32 32)"/><text x="32" y="36" text-anchor="middle" font-size="13" font-weight="700" fill="var(--ink)">'+pct+'%</text></svg>';
 }
+// ---- Flags: small inline SVG per language, never emoji ----
+// Korean taegeuk and Chinese stars are simplified to clean shapes.
+function flagStar(cx,cy,r,color){var pts=[];for(var i=0;i<10;i++){var ang=-Math.PI/2+i*Math.PI/5;var rr=i%2===0?r:r*0.42;pts.push((cx+rr*Math.cos(ang)).toFixed(1)+","+(cy+rr*Math.sin(ang)).toFixed(1));}return '<polygon points="'+pts.join(" ")+'" fill="'+(color||"#FFDE00")+'"/>';}
+function flagSvg(code){
+  var open='<svg viewBox="0 0 30 22" preserveAspectRatio="none" aria-hidden="true">';
+  if(code==="en"){return open+'<rect width="30" height="22" fill="#012169"/><polygon points="0,0 30,22 30,18.6 7.2,0" fill="#fff"/><polygon points="30,0 0,22 0,18.6 22.8,0" fill="#fff"/><polygon points="0,0 30,22 30,20.4 9.6,0" fill="#C8102E"/><polygon points="30,0 0,22 0,20.4 20.4,0" fill="#C8102E"/><rect x="12" width="6" height="22" fill="#fff"/><rect y="8" width="30" height="6" fill="#fff"/><rect x="13" width="4" height="22" fill="#C8102E"/><rect y="9" width="30" height="4" fill="#C8102E"/></svg>';}
+  if(code==="zh"){return open+'<rect width="30" height="22" fill="#DE2910"/>'+flagStar(7,6,4)+flagStar(14,3,1.4)+flagStar(17,5.5,1.4)+flagStar(17,9,1.4)+flagStar(14,11,1.4)+'</svg>';}
+  if(code==="my"){return open+'<rect width="30" height="7.4" fill="#FECB00"/><rect y="7.4" width="30" height="7.2" fill="#34B233"/><rect y="14.6" width="30" height="7.4" fill="#EA2839"/>'+flagStar(15,11,5,"#fff")+'</svg>';}
+  if(code==="de"){return open+'<rect width="30" height="7.4" fill="#000"/><rect y="7.4" width="30" height="7.2" fill="#DD0000"/><rect y="14.6" width="30" height="7.4" fill="#FFCE00"/></svg>';}
+  if(code==="fr"){return open+'<rect width="10" height="22" fill="#0055A4"/><rect x="10" width="10" height="22" fill="#fff"/><rect x="20" width="10" height="22" fill="#EF4135"/></svg>';}
+  if(code==="ko"){
+    var spec=[[0,0,0],[0,1,0],[0,1,0],[1,1,1]];
+    var pos=[[3,2],[22,2],[3,13],[22,13]];
+    var bars="";
+    for(var g=0;g<4;g++){for(var b=0;b<3;b++){var bx=pos[g][0],by=pos[g][1]+b*3.2;
+      if(spec[g][b]){bars+='<rect x="'+bx+'" y="'+by+'" width="2.4" height="2" fill="#000"/><rect x="'+(bx+3.6)+'" y="'+by+'" width="2.4" height="2" fill="#000"/>';}
+      else{bars+='<rect x="'+bx+'" y="'+by+'" width="6" height="2" fill="#000"/>';}}}
+    return open+'<rect width="30" height="22" fill="#fff"/><circle cx="15" cy="11" r="6" fill="#CD2E3A"/><path d="M9 11 A3 3 0 0 1 15 8 A3 3 0 0 1 21 11 A6 6 0 0 1 9 11Z" fill="#0047A0"/>'+bars+'</svg>';
+  }
+  if(code==="ja"){return open+'<rect width="30" height="22" fill="#fff"/><circle cx="15" cy="11" r="6" fill="#BC002D"/></svg>';}
+  if(code==="es"){return open+'<rect width="30" height="5.5" fill="#AA151B"/><rect y="5.5" width="30" height="11" fill="#F1BF00"/><rect y="16.5" width="30" height="5.5" fill="#AA151B"/></svg>';}
+  return open+'<rect width="30" height="22" fill="#ccc"/></svg>';
+}
+function flagHtml(code,lg){return '<span class="flag'+(lg?' flag-lg':'')+'" role="img" aria-label="'+esc(LANG_DB[code].name)+' flag">'+flagSvg(code)+'</span>';}
 // ---- Sheet / modal ----
 var sheetTimer=null,sheetStart=0,sheetLang="en";
 function openSheet(html,code){sheetLang=code||S.currentLang;document.getElementById("sheetBox").innerHTML=html;document.getElementById("sheet").classList.add("open");sheetStart=Date.now();}
@@ -555,6 +628,7 @@ var SV_MINUTES=[5,10,20,30];
 function openSurvey(code){
   var st=langState(code);var sv=st.survey||{};var gm=(S.surveyGlobal&&S.surveyGlobal.goal)||"";var mm=(S.surveyGlobal&&S.surveyGlobal.minutes)||20;
   var html=sheetHead("Starting survey: "+LANG_DB[code].name,"A short survey so your plan fits you. You can retake it anytime from Profile.");
+  html+='<p>'+flagHtml(code)+' <b>'+esc(LANG_DB[code].name)+'</b></p>';
   html+='<p><b>What is your goal?</b></p>'+SV_GOALS.map(function(g){return '<label style="display:block;margin:6px 0"><input type="radio" name="svGoal" value="'+esc(g)+'" '+(gm===g?'checked':'')+'> '+esc(g)+'</label>';}).join("");
   html+='<p><b>Daily minutes available?</b></p>'+SV_MINUTES.map(function(m){return '<label style="display:block;margin:6px 0"><input type="radio" name="svMin" value="'+m+'" '+(mm===m?'checked':'')+'> '+m+(m===30?' or more':'')+' minutes</label>';}).join("");
   html+='<p><b>Prior experience with '+esc(LANG_DB[code].name)+'</b></p>'+["None","A little","Used before"].map(function(e){return '<label style="display:block;margin:6px 0"><input type="radio" name="svExp" value="'+esc(e)+'" '+(sv.experience===e?'checked':'')+'> '+esc(e)+'</label>';}).join("");
@@ -776,7 +850,7 @@ function miniTestQuestions(code,level,idx){
 var LESSON_PLAYER=null;
 function startLessonPlayer(code,level,idx){
   var meta=lessonMeta(code,level,idx);
-  LESSON_PLAYER={code:code,level:level,idx:idx,lid:meta.id,title:meta.title,kind:meta.kind,units:buildLessonUnits(code,level,idx),u:0,p:0,feedback:null,orderPlaced:null,orderRemaining:null,orderMsg:""};
+  LESSON_PLAYER={code:code,level:level,idx:idx,lid:meta.id,title:meta.title,kind:meta.kind,units:buildLessonUnits(code,level,idx),u:0,p:0,feedback:null,selected:null,orderPlaced:null,orderRemaining:null,orderMsg:""};
   var pr0=LESSON_PLAYER.units[0].practices[0];
   if(pr0.type==="order"){LESSON_PLAYER.orderPlaced=[];LESSON_PLAYER.orderRemaining=pr0.words.slice();}
   renderPlayer();
@@ -786,7 +860,8 @@ function renderPlayer(){
   var unit=lp.units[lp.u];var pr=unit.practices[lp.p];
   var html=sheetHead(lp.title,LANG_DB[lp.code].name+" · "+lp.level+" "+LEVEL_NAMES[lp.level]+" · Unit "+(lp.u+1)+" of 15 · Practice "+(lp.u*2+lp.p+1)+" of 30");
   html+=lessonHeader(lp);
-  html+='<div class="progress-track" style="margin:14px 0"><div class="progress-fill" style="width:'+Math.round((lp.u*2+lp.p)/30*100)+'%"></div></div>';
+  html+='<p class="player-count">Unit '+(lp.u+1)+' of 15 · Practice '+(lp.u*2+lp.p+1)+' of 30</p>';
+  html+='<div class="progress-track" style="margin:8px 0 14px"><div class="progress-fill" style="width:'+Math.round((lp.u*2+lp.p)/30*100)+'%"></div></div>';
   html+='<div class="card" style="box-shadow:none">'+unit.study+'</div>';
   if(lp.feedback){
     html+='<p><b>'+(lp.feedback.ok?'Correct!':'Not quite.')+'</b>'+(lp.feedback.ok?'':' The answer is <strong>'+esc(lp.feedback.answer)+'</strong>.')+'</p>';
@@ -794,19 +869,22 @@ function renderPlayer(){
   } else if(pr.type==="mc"){
     html+='<p style="font-size:17px;font-weight:600">'+esc(pr.q)+'</p>';
     if(pr.play)html+='<button class="btn btn-sm" type="button" onclick="speak('+q(pr.play)+','+q(lp.code)+')">Listen</button>';
-    pr.options.forEach(function(o,i){html+='<button class="opt" type="button" onclick="playerAnswer('+i+')">'+esc(o)+'</button>';});
+    pr.options.forEach(function(o,i){html+='<button class="opt'+(lp.selected===i?' sel':'')+'" type="button" onclick="playerSelect('+i+')">'+esc(o)+'</button>';});
+    html+='<button class="btn btn-primary btn-block" style="margin-top:10px" type="button" onclick="playerCheck()">Check</button>';
   } else if(pr.type==="write"){
     html+='<p style="font-size:17px;font-weight:600">'+esc(pr.q)+'</p>';
-    html+='<label>Your answer</label><input class="input" id="playerWrite" placeholder="Type the word here"><button class="btn btn-primary btn-block" style="margin-top:10px" type="button" onclick="playerCheckWrite()">Check answer</button>';
+    html+='<label>Your answer</label><input class="input" id="playerWrite" placeholder="Type the word here"><button class="btn btn-primary btn-block" style="margin-top:10px" type="button" onclick="playerCheckWrite()">Check</button>';
   } else if(pr.type==="order"){
     html+='<p style="font-size:17px;font-weight:600">Tap these words in alphabetical order.</p>';
     if(lp.orderMsg)html+='<p class="note">'+esc(lp.orderMsg)+'</p>';
     html+='<p><strong>Placed so far:</strong> '+(lp.orderPlaced.length?lp.orderPlaced.map(function(w){return esc(w.w);}).join(" · "):"none yet")+'</p>';
-    lp.orderRemaining.forEach(function(w,i){html+='<button class="opt" type="button" onclick="playerOrderTap('+i+')">'+esc(w.w)+'</button>';});
+    lp.orderRemaining.forEach(function(w,i){html+='<button class="word-chip" type="button" onclick="playerOrderTap('+i+')">'+esc(w.w)+'</button>';});
   }
   html+='<button class="btn btn-block" style="margin-top:12px" type="button" onclick="closeSheet()">Leave lesson (not counted as done)</button>';
   openSheet(html,lp.code);
 }
+function playerSelect(i){LESSON_PLAYER.selected=i;renderPlayer();}
+function playerCheck(){var lp=LESSON_PLAYER;if(lp.selected===null||lp.selected===undefined){toast("Choose an answer first, then tap Check.");return;}playerAnswer(lp.selected);}
 function playerAnswer(i){
   var lp=LESSON_PLAYER;var pr=lp.units[lp.u].practices[lp.p];
   lp.feedback={ok:pr.options[i]===pr.answer,answer:pr.answer};
@@ -828,7 +906,7 @@ function playerOrderTap(i){
   renderPlayer();
 }
 function playerNext(){
-  var lp=LESSON_PLAYER;lp.feedback=null;lp.p++;
+  var lp=LESSON_PLAYER;lp.feedback=null;lp.selected=null;lp.p++;
   if(lp.p>=2){lp.p=0;lp.u++;}
   if(lp.u>=15){startMiniTest(lp);return;}
   var pr=lp.units[lp.u].practices[lp.p];
@@ -856,24 +934,65 @@ var TAB="home";
 function setTab(t){if(t==="learn"&&S.name&&!S.tutorialDone){if(!S.accepted){showReadFirst();return;}showTutorial(0);return;}TAB=t;render();}
 function tabBtn(t,ic,label){return '<button class="tab '+(TAB===t?'on':'')+'" type="button" onclick="setTab('+q(t)+')">'+icon(ic)+'<span>'+label+'</span></button>';}
 function renderTabs(){document.getElementById("tabs").innerHTML=tabBtn("home","home","Home")+tabBtn("learn","book","Learn")+tabBtn("practice","target","Practice")+tabBtn("progress","chart","Progress")+tabBtn("profile","user","Profile");}
+// ---- Real-data helpers for Home, Progress, and Profile ----
+function totalLessonsDone(){var n=0;Object.keys(S.langs).forEach(function(c){n+=S.langs[c].doneLessons.length;});return n;}
+function totalWordsLearned(){var n=0;Object.keys(S.langs).forEach(function(c){n+=S.langs[c].learnedWords.length;});return n;}
+function maxStreak(){var m=0;Object.keys(S.langs).forEach(function(c){m=Math.max(m,S.langs[c].streak||0);});return m;}
+function totalStoriesRead(){var n=0;Object.keys(S.langs).forEach(function(c){n+=(S.langs[c].storiesRead||[]).length;});return n;}
+function examsPassedCount(){var n=0;Object.keys(S.langs).forEach(function(c){LEVEL_ORDER.forEach(function(lv){if(S.langs[c].examPass[lv])n++;});});return n;}
+function anyPlacement(){var ok=false;Object.keys(S.langs).forEach(function(c){if(S.langs[c].diag)ok=true;});return ok;}
+function achievementsList(){
+  var done=totalLessonsDone(),words=totalWordsLearned(),streak=maxStreak(),stories=totalStoriesRead();
+  return [
+   {id:"first-lesson",t:"First lesson",d:"Complete your first lesson.",earned:done>=1},
+   {id:"ten-lessons",t:"Ten lessons",d:"Complete 10 lessons.",earned:done>=10},
+   {id:"seven-streak",t:"7 day streak",d:"Study 7 days in a row.",earned:streak>=7},
+   {id:"hundred-words",t:"100 words learned",d:"Learn 100 words in tests and practice.",earned:words>=100},
+   {id:"first-exam",t:"First level exam passed",d:"Pass a level exam with 70 percent or more.",earned:examsPassedCount()>=1},
+   {id:"first-placement",t:"Placement completed",d:"Finish a placement test for any language.",earned:anyPlacement()},
+   {id:"first-story",t:"First story read",d:"Mark a story as read.",earned:stories>=1}
+  ];
+}
+function achievementsHtml(){return '<div class="card">'+achievementsList().map(function(a){return '<div class="ach'+(a.earned?'':' locked')+'"><span class="ach-badge">'+icon(a.earned?"check":"lock")+'</span><div style="flex:1"><b>'+esc(a.t)+'</b><p style="margin:2px 0 0">'+esc(a.d)+'</p></div><span class="pill '+(a.earned?'good':'lock')+'">'+(a.earned?'Earned':'Locked')+'</span></div>';}).join("")+'</div>';}
+function weekMinutes(){return last7Days().map(function(d){var secs=0;Object.keys(S.langs).forEach(function(c){secs+=S.langs[c].activity[d]||0;});return {date:d,mins:Math.round(secs/60)};});}
+function weekChartHtml(){
+  var days=weekMinutes();var max=1;days.forEach(function(x){if(x.mins>max)max=x.mins;});
+  return '<div class="card"><div class="week-chart" id="weekChart">'+days.map(function(x){var h=Math.max(4,Math.round(x.mins/max*84));return '<div class="week-col"><b>'+x.mins+'m</b><i style="height:'+h+'px"></i><span>'+x.date.slice(5)+'</span></div>';}).join("")+'</div><p class="note" style="margin-top:10px">Minutes studied per day, from your recorded activity on this device. Days with no study show 0 minutes.</p></div>';
+}
+function renderResourcesHtml(){
+  return '<div>'+FREE_RESOURCES.map(function(r){return '<a class="res-row" href="'+esc(r.url)+'" target="_blank" rel="noopener"><b>'+esc(r.name)+'</b><p>'+esc(r.desc)+'</p><span class="lic">'+esc(r.lic)+'</span></a>';}).join("")+'</div>';
+}
 function langCard(code){
   var L=LANG_DB[code];var cur=currentLesson(code);var pct=progressPct(code);
   var curText=cur.lesson?cur.lesson.title:(cur.exam?currentLevel(code)+" Level Exam":"Complete");
-  return '<button class="card" style="width:100%;text-align:left;color:var(--ink)" type="button" onclick="openLang('+q(code)+')"><div style="display:flex;gap:12px;align-items:center"><div style="flex:1;min-width:0"><div style="font-size:18px;font-weight:700">'+esc(L.name)+'</div><div class="kbd">'+esc(L.native)+' · '+currentLevel(code)+' '+LEVEL_NAMES[currentLevel(code)]+'</div><div style="margin:8px 0" class="progress-track"><div class="progress-fill" style="width:'+pct+'%"></div></div><div class="kbd">'+pct+'% complete · Next: '+esc(curText)+'</div></div>'+ring(pct)+'</div></button>';
+  var due=dueLessons(code).length+dueWords(code).length;
+  var meta=due>0?due+' review'+(due===1?'':'s')+' due':'Streak '+(langState(code).streak||0)+' days';
+  return '<button class="card" style="width:100%;text-align:left;color:var(--ink)" type="button" onclick="openLang('+q(code)+')"><div style="display:flex;gap:12px;align-items:center">'+flagHtml(code)+'<div style="flex:1;min-width:0"><div style="font-size:18px;font-weight:700">'+esc(L.name)+'</div><div class="kbd">'+esc(L.native)+' · '+currentLevel(code)+' '+LEVEL_NAMES[currentLevel(code)]+' · '+meta+'</div><div style="margin:8px 0" class="progress-track"><div class="progress-fill" style="width:'+pct+'%"></div></div><div class="kbd">'+pct+'% complete · Next: '+esc(curText)+'</div></div>'+ring(pct)+'</div></button>';
 }
+function greetingWord(){var h=new Date().getHours();if(h<12)return "Good morning";if(h<18)return "Good afternoon";return "Good evening";}
+function homeGoalSave(){var v=parseInt(document.getElementById("goalEdit").value,10);if(!v||v<5||v>180){toast("Enter a daily goal between 5 and 180 minutes.");return;}S.prefs.dailyGoalMin=v;if(S.surveyGlobal)S.surveyGlobal.minutes=v;save();render();toast("Daily goal saved");}
 function renderHome(){
   if(!S.name)return renderOnboarding();
   var curLang=S.currentLang;var cur=currentLesson(curLang);
-  var todaySecs=langState(curLang).activity[todayStr()]||0;
-  var goalMin=S.prefs.dailyGoalMin||20;var dailyPct=Math.min(100,Math.round(todaySecs/60/goalMin*100));
-  var html='<h2>Good day, '+esc(S.name)+'</h2><p>Continue where you left off, and keep your streak going.</p>';
-  html+='<div class="grid grid2"><div class="card"><div class="kbd">Continue Learning</div><h3 style="margin:6px 0">'+esc(LANG_DB[curLang].name)+' · '+(cur.lesson?esc(cur.lesson.title):esc(currentLevel(curLang)+" Level Exam"))+'</h3><button class="btn btn-primary" type="button" onclick="'+(cur.lesson?'openLesson('+q(curLang)+','+q(cur.level)+','+(parseInt(cur.lesson.id.split("-L")[1])-1)+')':'openLevelExam('+q(curLang)+','+q(cur.level)+')')+'">Continue</button></div>';
-  html+='<div class="card"><div class="kbd">Learning streak</div><h3 style="margin:6px 0">'+streakFire(langState(curLang).streak||0)+(langState(curLang).streak||0)+' days</h3><p style="margin:0">Daily goal: '+goalMin+' minutes · Today: '+Math.round(todaySecs/60)+' minutes ('+dailyPct+'%)</p><div class="progress-track" style="margin-top:10px"><div class="progress-fill" style="width:'+dailyPct+'%"></div></div></div></div>';
-  html+='<div class="card" style="margin-top:14px"><div class="kbd">Dictionary</div><h3 style="margin:6px 0">Look up a word</h3><p style="margin:0 0 10px">Search the dictionary in any of the 8 languages. Free, no energy cost.</p><button class="btn" type="button" onclick="openDictionary()">Open dictionary</button></div>';
+  var goalMin=S.prefs.dailyGoalMin||20;
+  var todaySecs=0;S.selected.forEach(function(c){todaySecs+=langState(c).activity[todayStr()]||0;});
+  var todayMins=Math.round(todaySecs/60);
+  var dailyPct=goalMin>0?Math.min(100,Math.round(todayMins/goalMin*100)):0;
+  var doneCount=langState(curLang).doneLessons.length;
+  var pct=progressPct(curLang);
+  var html='<h2>'+greetingWord()+', '+esc(S.name)+'</h2><p>Continue where you left off, and keep your streak going.</p>';
+  html+='<div class="card hero"><div style="display:flex;gap:12px;align-items:center">'+flagHtml(curLang,true)+'<div style="flex:1;min-width:0"><div class="kbd">Pick up where you left off</div><h3 style="margin:6px 0;color:#fff">'+esc(LANG_DB[curLang].name)+' · '+(cur.lesson?esc(cur.lesson.title):esc(currentLevel(curLang)+" Level Exam"))+'</h3><p style="margin:0 0 10px">'+doneCount+' of 120 lessons done in '+esc(LANG_DB[curLang].name)+' · '+pct+'% complete</p></div></div><div class="progress-track" style="margin:4px 0 12px"><div class="progress-fill" style="width:'+pct+'%"></div></div><button class="btn btn-primary" type="button" onclick="'+(cur.lesson?'openLesson('+q(curLang)+','+q(cur.level)+','+(parseInt(cur.lesson.id.split("-L")[1])-1)+')':'openLevelExam('+q(curLang)+','+q(cur.level)+')')+'">Continue</button></div>';
+  html+='<h3>My Courses</h3><div>'+S.selected.map(function(c){var p=progressPct(c);var cl=currentLesson(c);return '<button class="course-row" type="button" onclick="openLang('+q(c)+')">'+flagHtml(c)+'<div class="t"><b>'+esc(LANG_DB[c].name)+'</b><span>'+currentLevel(c)+' '+LEVEL_NAMES[currentLevel(c)]+' · '+(cl.lesson?esc(cl.lesson.title):esc(currentLevel(c)+" Level Exam"))+'</span><div class="progress-track" style="margin-top:6px"><div class="progress-fill" style="width:'+p+'%"></div></div></div><b>'+p+'%</b></button>';}).join("")+'</div>';
+  html+='<h3>Today\'s Goal</h3><div class="card"><div style="display:flex;justify-content:space-between;align-items:baseline"><b>'+todayMins+' of '+goalMin+' minutes</b><span class="pill cur">'+dailyPct+'%</span></div><div class="progress-track" style="margin:10px 0"><div class="progress-fill" style="width:'+dailyPct+'%"></div></div><p style="margin:0 0 10px">Minutes studied today across your selected languages, against your surveyed daily goal of '+goalMin+' minutes.</p><label for="goalEdit">Daily goal (minutes)</label><div style="display:flex;gap:8px"><input class="input" type="number" min="5" max="180" id="goalEdit" value="'+goalMin+'"><button class="btn btn-primary" type="button" onclick="homeGoalSave()">Save</button></div></div>';
+  html+='<h3>Quick Practice</h3><div class="tiles">';
+  var lv=currentLevel(curLang);
+  html+='<button class="qtile" type="button" onclick="startQuiz({code:'+q(curLang)+',level:'+q(lv)+',title:'+q("Vocabulary Practice")+',questions:vocabQuestions('+q(curLang)+','+q(lv)+',8,['+q("Vocabulary")+'])})">'+icon("book")+'Vocabulary<span>Word meanings</span></button>';
+  html+='<button class="qtile" type="button" onclick="startListeningPractice()">'+icon("ear")+'Listening<span>Hear the word, pick the meaning</span></button>';
+  html+='<button class="qtile" type="button" onclick="openLesson('+q(curLang)+','+q(lv)+',6)">'+icon("mic")+'Speaking<span>Listen and repeat aloud</span></button>';
+  html+='<button class="qtile" type="button" onclick="startQuiz({code:'+q(curLang)+',level:'+q(lv)+',title:'+q("Grammar Practice")+',questions:vocabQuestions('+q(curLang)+','+q(lv)+',6,['+q("Grammar")+'])})">'+icon("pen")+'Grammar<span>Sentence patterns</span></button>';
+  html+='</div>';
   html+='<h3>Your plan for today</h3>'+planCard(curLang);
-  html+='<h3>Recently studied languages</h3><div class="grid grid2">'+(S.recentLangs.length?S.recentLangs.map(function(c){return langCard(c);}).join(""):'<p>No study yet. Open Learn and start your first lesson.</p>')+'</div>';
-  html+='<h3>Weekly activity</h3><div class="card"><div class="bar">'+last7Days().map(function(d){var secs=0;Object.keys(S.langs).forEach(function(c){secs+=S.langs[c].activity[d]||0;});var mins=Math.round(secs/60);return '<i style="height:'+Math.max(6,Math.min(72,mins*3))+'px" title="'+d+': '+mins+' min"></i>';}).join("")+'</div><div style="display:flex;justify-content:space-between" class="kbd">'+last7Days().map(function(d){return '<span>'+d.slice(5)+'</span>';}).join("")+'</div></div>';
-  html+='<h3>Recommended lesson</h3><p>'+(cur.lesson?esc(cur.lesson.title)+' in '+esc(LANG_DB[curLang].name):'Take the '+currentLevel(curLang)+' level exam in '+esc(LANG_DB[curLang].name))+'</p>';
+  html+='<div class="card" style="margin-top:14px"><div class="kbd">Dictionary</div><h3 style="margin:6px 0">Look up a word</h3><p style="margin:0 0 10px">Search the dictionary in any of the 8 languages. Free, no energy cost.</p><button class="btn" type="button" onclick="openDictionary()">Open dictionary</button></div>';
   return html;
 }
 function last7Days(){var out=[];for(var i=6;i>=0;i--){var d=new Date();d.setDate(d.getDate()-i);out.push(todayStr(d));}return out;}
@@ -884,9 +1003,18 @@ function saveName(){var v=document.getElementById("nameIn").value.trim();if(!v){
 function renderWelcome(){
   document.getElementById("app").innerHTML='<div class="card" style="max-width:520px;margin:60px auto;text-align:center"><h2>Welcome to NES:Learn, '+esc(S.name)+'.</h2><p>Your name is saved on this device. Pick a language and start with Lesson 1.</p><button class="btn btn-primary btn-block" type="button" onclick="setTab(\'learn\')">Start learning</button></div>';
 }
+function filterLearn(v){
+  var qv=stripAccents(v||"");
+  var cards=document.querySelectorAll("#learnCards [data-langname]");
+  cards.forEach(function(el){var n=el.getAttribute("data-langname");el.style.display=(!qv||stripAccents(n).indexOf(qv)>=0)?"":"none";});
+}
 function renderLearn(){
-  var html='<h2>Learn</h2><p>Your selected languages. Progress is tracked separately for each language.</p><div class="grid grid2">'+S.selected.map(function(c){return langCard(c);}).join("")+'</div>';
+  var html='<h2>Learn</h2><p>Your selected languages. Progress is tracked separately for each language.</p>';
+  html+='<label for="learnSearch">Search languages</label><input class="input" id="learnSearch" placeholder="Search by language name" oninput="filterLearn(this.value)">';
+  html+='<div class="grid grid2" id="learnCards" style="margin-top:14px">'+S.selected.map(function(c){return '<div data-langname="'+esc(LANG_DB[c].name)+'">'+langCard(c)+'</div>';}).join("")+'</div>';
+  html+='<h3>Stories</h3><div class="card"><p style="margin:0 0 10px">Short stories in every language and level, with listening and 3 questions each. Reading a story costs no energy.</p><button class="btn btn-primary" type="button" onclick="openStoryList()">Open stories</button></div>';
   html+='<div class="card" style="margin-top:14px"><div class="kbd">Dictionary</div><h3 style="margin:6px 0">Look up words in any of the 8 languages</h3><p style="margin:0 0 10px">A growing dictionary, not a complete dictionary of any language. Dictionary use costs no energy.</p><button class="btn btn-primary" type="button" onclick="openDictionary()">Open dictionary</button></div>';
+  html+='<h3>Free Resources</h3>'+renderResourcesHtml();
   html+='<h3>Add a language</h3><div style="display:flex;flex-wrap:wrap;gap:8px">'+Object.keys(LANG_DB).filter(function(c){return S.selected.indexOf(c)<0;}).map(function(c){return '<button class="btn btn-sm" type="button" onclick="addLang('+q(c)+')">+ '+esc(LANG_DB[c].name)+'</button>';}).join("")+'</div>';
   return html;
 }
@@ -965,7 +1093,7 @@ function openLang(code){
   S.currentLang=code;save();
   var L=LANG_DB[code];var cur=currentLesson(code);
   var html='<button class="btn btn-sm" type="button" onclick="setTab(\'learn\')">← All languages</button>';
-  html+='<h2>'+esc(L.name)+'</h2><p>'+esc(L.native)+' · Current level: '+currentLevel(code)+' '+LEVEL_NAMES[currentLevel(code)]+' · '+progressPct(code)+'% complete'+(langState(code).placedLevel?(' · Placed at '+langState(code).placedLevel+' by diagnostic'):'')+'</p>';
+  html+='<h2>'+flagHtml(code,true)+' '+esc(L.name)+'</h2><p>'+esc(L.native)+' · Current level: '+currentLevel(code)+' '+LEVEL_NAMES[currentLevel(code)]+' · '+progressPct(code)+'% complete'+(langState(code).placedLevel?(' · Placed at '+langState(code).placedLevel+' by diagnostic'):'')+'</p>';
   html+='<div class="card"><div class="kbd">Continue Learning</div><h3 style="margin:6px 0">'+(cur.lesson?esc(cur.lesson.title):esc(currentLevel(code)+" Level Exam"))+'</h3><button class="btn btn-primary" type="button" onclick="'+(cur.lesson?'openLesson('+q(code)+','+q(cur.level)+','+(parseInt(cur.lesson.id.split("-L")[1])-1)+')':'openLevelExam('+q(code)+','+q(cur.level)+')')+'">Continue</button></div>';
   html+=planCard(code);
   html+='<h3>Learning Path</h3>';
@@ -1024,9 +1152,81 @@ function openLang(code){
   document.getElementById("app").innerHTML=html;renderTabs();
   var cn=document.getElementById("road-current");if(cn&&cn.scrollIntoView)cn.scrollIntoView({block:"center",behavior:"auto"});
 }
+// ---- Stories: 8 languages x 6 levels, built from lesson banks, no energy cost ----
+var STORY=null;
+function storyId(code,level){return code+"-"+level+"-story";}
+function storyQuestions(code,level){
+  var st=STORIES[code][level];
+  var v=levelData(code,level).vocab;
+  var themeOpts=pickOptions(LEVEL_THEMES[level],["greetings, numbers, family, and food","daily life, travel, and work","opinions, culture, and current topics","argumentation and professional life","academic and abstract topics","nuance, idiom, and register"],4);
+  return [
+    {q:"What is this story mainly about?",options:themeOpts,answer:LEVEL_THEMES[level]},
+    {q:"Which sentence opens the story?",options:shuffle(st.sentences.slice(0,4),7),answer:st.sentences[0]},
+    {q:'What does "'+v[0].w+'" mean?',options:pickOptions(v[0].gloss,v.map(function(w){return w.gloss;}),4),answer:v[0].gloss}
+  ];
+}
+function openStoryList(){
+  var html=sheetHead("Stories","Short stories in every language and level. Reading a story costs no energy.");
+  Object.keys(STORIES).forEach(function(c){
+    html+='<h4>'+flagHtml(c)+' '+esc(LANG_DB[c].name)+'</h4>';
+    LEVEL_ORDER.forEach(function(lv){
+      var data=STORIES[c][lv];
+      var read=(langState(c).storiesRead||[]).indexOf(storyId(c,lv))>=0;
+      html+='<button class="btn btn-block" style="margin:6px 0;text-align:left" type="button" onclick="openStory('+q(c)+','+q(lv)+')"><b>'+esc(data.title)+'</b> · '+lv+' '+LEVEL_NAMES[lv]+'<br><span class="kbd">'+data.sentences.length+' sentences · 3 questions · '+(read?'Read':'Not read yet')+'</span></button>';
+    });
+  });
+  html+='<p class="note">Stories are written for this app from the words and sentences in your lessons. They are not authentic published texts.</p>';
+  openSheet(html,S.currentLang);
+}
+function openStory(code,level){
+  STORY={code:code,level:level,qi:0,answers:[],feedback:null};
+  renderStory();
+}
+function renderStory(){
+  var st=STORY;if(!st)return;
+  var data=STORIES[st.code][st.level];
+  var read=(langState(st.code).storiesRead||[]).indexOf(storyId(st.code,st.level))>=0;
+  var html=sheetHead(data.title+" · "+LANG_DB[st.code].name+" "+st.level,"A short story for learners. It is written for this app from lesson words, not an authentic published text.");
+  html+='<p>'+flagHtml(st.code)+' '+esc(LANG_DB[st.code].name)+' · '+st.level+' '+LEVEL_NAMES[st.level]+' · '+data.sentences.length+' sentences · '+(read?'Read':'Not read yet')+'</p>';
+  html+=data.sentences.map(function(s,i){return '<div class="story-sent"><p>'+esc(s)+'</p><button class="btn btn-sm" type="button" onclick="speak('+q(s)+','+q(st.code)+')">Listen</button></div>';}).join("");
+  html+='<p class="note">Listen buttons use your device speech synthesis where supported, not recorded native audio.</p>';
+  var qs=storyQuestions(st.code,st.level);
+  html+='<h4>Check your understanding</h4><p class="player-count">Question '+(st.qi+1)+' of 3</p>';
+  if(st.qi<3){
+    var qq=qs[st.qi];
+    html+='<p style="font-size:17px;font-weight:600">'+esc(qq.q)+'</p>';
+    if(st.feedback){
+      html+='<p><b>'+(st.feedback.ok?'Correct!':'Not quite.')+'</b>'+(st.feedback.ok?'':' The answer is <strong>'+esc(st.feedback.answer)+'</strong>.')+'</p>';
+      html+='<button class="btn btn-primary btn-block" type="button" onclick="storyNext()">Next</button>';
+    } else {
+      qq.options.forEach(function(o,i){html+='<button class="opt" type="button" onclick="storyAnswer('+i+')">'+esc(o)+'</button>';});
+    }
+  } else {
+    var correct=st.answers.filter(function(a){return a;}).length;
+    html+='<p><strong>You answered '+correct+' of 3 questions correctly.</strong></p>';
+    if(!read)html+='<button class="btn btn-primary btn-block" type="button" onclick="markStoryRead()">Mark as read</button>';
+    else html+='<p class="note">You have marked this story as read.</p>';
+  }
+  html+='<button class="btn btn-block" style="margin-top:12px" type="button" onclick="openStoryList()">Back to stories</button>';
+  openSheet(html,st.code);
+}
+function storyAnswer(i){
+  var st=STORY;var q=storyQuestions(st.code,st.level)[st.qi];
+  st.feedback={ok:q.options[i]===q.answer,answer:q.answer};
+  st.answers.push(q.options[i]===q.answer);
+  renderStory();
+}
+function storyNext(){var st=STORY;st.feedback=null;st.qi++;renderStory();}
+function markStoryRead(){
+  var st=STORY;var ls=langState(st.code);
+  if(!ls.storiesRead)ls.storiesRead=[];
+  var id=storyId(st.code,st.level);
+  if(ls.storiesRead.indexOf(id)<0)ls.storiesRead.push(id);
+  save();toast("Story marked as read");renderStory();
+}
 function renderPractice(){
   var code=S.currentLang;var lv=currentLevel(code);
-  var html='<h2>Practice</h2><p>Practising '+esc(LANG_DB[code].name)+' · Level '+lv+'</p>';
+  var html='<h2>Practice</h2><p>'+flagHtml(code)+' Practising '+esc(LANG_DB[code].name)+' · Level '+lv+'</p>';
   html+='<label>Practice language</label><div style="display:flex;flex-wrap:wrap;gap:8px">'+S.selected.map(function(c){return '<button class="btn btn-sm" type="button" onclick="S.currentLang='+q(c)+';save();render()">'+esc(LANG_DB[c].name)+(c===code?' ✓':'')+'</button>';}).join("")+'</div>';
   var btn=function(t,fn){return '<button class="card" style="width:100%;text-align:left;color:var(--ink)" type="button" onclick="'+fn+'"><b>'+t+'</b></button>';};
   html+='<div class="grid grid2" style="margin-top:14px">';
@@ -1039,6 +1239,7 @@ function renderPractice(){
   html+=btn("Alphabetical Order game","openAlphaGame('"+code+"')");
   html+=btn("View alphabet","setTab('learn');openLang('"+code+"')");
   html+='</div>';
+  html+='<h3>Stories</h3><div class="card"><p style="margin:0 0 10px">Short stories in every language and level, with listening and 3 questions each. Reading a story costs no energy.</p><button class="btn btn-primary" type="button" onclick="openStoryList()">Open stories</button></div>';
   return html;
 }
 function startListeningPractice(){
@@ -1058,7 +1259,10 @@ function renderProgress(){
   Object.keys(S.langs).forEach(function(c){var st=S.langs[c];doneLessons+=st.doneLessons.length;totalSecs+=st.studySeconds;st.testHistory.forEach(function(t){totalTests++;totalScore+=t.score;totalQ+=t.total;});totalLearned+=st.learnedWords.length;});
   totalLessons=Object.keys(LANG_DB).length*120;
   var html='<h2>Progress</h2><div class="stat"><div class="card"><b>'+doneLessons+' / '+totalLessons+'</b><span>Lessons completed</span></div><div class="card"><b>'+Math.round(totalSecs/60)+' min</b><span>Study time</span></div><div class="card"><b>'+(totalQ?Math.round(totalScore/totalQ*100):0)+'%</b><span>Average test score ('+totalTests+' tests)</span></div><div class="card"><b>'+totalLearned+'</b><span>Words learned</span></div></div>';
-  html+='<h3>Progress for every language</h3><div class="grid grid2">'+Object.keys(LANG_DB).map(function(c){return '<div class="card"><b>'+esc(LANG_DB[c].name)+'</b><p style="margin:4px 0">Level '+currentLevel(c)+' · '+langState(c).doneLessons.length+' lessons · '+streakFire(langState(c).streak||0)+'Streak '+(langState(c).streak||0)+' days</p><div class="progress-track"><div class="progress-fill" style="width:'+progressPct(c)+'%"></div></div><div class="kbd">'+progressPct(c)+'% complete</div></div>';}).join("")+'</div>';
+  html+='<div class="stat" style="margin-top:12px"><div class="card"><b>'+doneLessons+'</b><span>Lessons done</span></div><div class="card"><b>'+totalLearned+'</b><span>Words learned</span></div><div class="card"><b>'+maxStreak()+' days</b><span>Best streak</span></div><div class="card"><b>'+totalStoriesRead()+'</b><span>Stories read</span></div></div>';
+  html+='<h3>Weekly activity</h3>'+weekChartHtml();
+  html+='<h3>Achievements</h3>'+achievementsHtml();
+  html+='<h3>Progress for every language</h3><div class="grid grid2">'+Object.keys(LANG_DB).map(function(c){return '<div class="card"><b>'+flagHtml(c)+' '+esc(LANG_DB[c].name)+'</b><p style="margin:4px 0">Level '+currentLevel(c)+' · '+langState(c).doneLessons.length+' lessons · '+streakFire(langState(c).streak||0)+'Streak '+(langState(c).streak||0)+' days</p><div class="progress-track"><div class="progress-fill" style="width:'+progressPct(c)+'%"></div></div><div class="kbd">'+progressPct(c)+'% complete</div></div>';}).join("")+'</div>';
   html+='<h3>Skill mastery (on-device adaptive plan)</h3><div class="card">'+ADAPT_SKILLS.map(function(s){var v=Math.round(masteryEnsure(S.currentLang)[s]*100);return '<p style="margin:8px 0">'+esc(s)+' · '+v+'%</p><div class="progress-track"><div class="progress-fill" style="width:'+v+'%"></div></div>';}).join("")+'<p class="note">Mastery is a simplified Bayesian estimate updated after every quiz answer on this device. It is not a certified level.</p></div>';
   html+='<h3>Test history</h3>';
   var hist=[];Object.keys(S.langs).forEach(function(c){S.langs[c].testHistory.forEach(function(t){hist.push({c:c,t:t});});});
@@ -1066,11 +1270,47 @@ function renderProgress(){
   html+=hist.length?hist.map(function(h){return '<p>'+esc(h.t.date)+' · '+esc(LANG_DB[h.c].name)+' · '+esc(h.t.type)+' · '+h.t.score+'/'+h.t.total+'</p>';}).join(""):'<p>No tests taken yet.</p>';
   return html;
 }
+function openSavedWords(){
+  var rows=[];
+  Object.keys(S.langs).forEach(function(c){var st=langState(c);st.savedWords.forEach(function(id){var w=findWord(c,id);if(w)rows.push({c:c,w:w});});});
+  var html=sheetHead("My Vocabulary",rows.length?rows.length+" saved word"+(rows.length===1?"":"s"):"No saved words yet. Tap Save on any word card to add one.");
+  html+=rows.length?rows.map(function(r){return wordCard(r.c,r.w);}).join(""):"<p>Your saved words will appear here.</p>";
+  openSheet(html,S.currentLang);
+}
+function openSavedLessons(){
+  var rows=[];
+  Object.keys(S.langs).forEach(function(c){langState(c).doneLessons.forEach(function(id){var f=findLessonById(c,id);rows.push({c:c,f:f});});});
+  var html=sheetHead("Saved Lessons",rows.length?rows.length+" completed lesson"+(rows.length===1?"":"s"):"No lessons completed yet.");
+  html+=rows.length?rows.map(function(r){return '<button class="btn btn-block" style="margin:6px 0;text-align:left" type="button" onclick="openLesson('+q(r.c)+','+q(r.f.level)+','+r.f.idx+')"><b>'+esc(LANG_DB[r.c].name)+' · '+esc(r.f.meta.title)+'</b></button>';}).join(""):"<p>Completed lessons will appear here. A lesson counts as done only after its small test.</p>";
+  openSheet(html,S.currentLang);
+}
+function openAchievements(){
+  openSheet(sheetHead("Achievements","Earned from your real progress on this device.")+achievementsHtml(),S.currentLang);
+}
+function openSettings(){
+  var html=sheetHead("Settings","Theme, daily goal, name, and your data.");
+  html+='<label>Theme</label><select class="input" id="themeSel2" onchange="S.prefs.theme=this.value;save();render()"><option value="light" '+(S.prefs.theme==="light"?'selected':'')+'>Light</option><option value="dark" '+(S.prefs.theme==="dark"?'selected':'')+'>Dark</option></select>';
+  html+='<label>Daily goal (minutes)</label><input class="input" type="number" min="5" max="180" id="goalIn2" value="'+(S.prefs.dailyGoalMin||20)+'"><button class="btn" style="margin-top:10px" type="button" onclick="S.prefs.dailyGoalMin=parseInt(document.getElementById(\'goalIn2\').value)||20;save();render();toast(\'Daily goal saved\')">Save goal</button>';
+  html+='<label>Your name</label><input class="input" id="nameEdit2" value="'+esc(S.name)+'"><button class="btn" style="margin-top:10px" type="button" onclick="S.name=document.getElementById(\'nameEdit2\').value.trim()||S.name;save();toast(\'Name saved\');render()">Save name</button>';
+  html+='<label style="display:flex;gap:10px;align-items:center"><input type="checkbox" '+(S.prefs.voice?'checked':'')+' onchange="S.prefs.voice=this.checked;save()"> Spoken playback where supported</label>';
+  html+='<h4>Your data</h4><div style="display:flex;flex-wrap:wrap;gap:8px"><button class="btn" type="button" onclick="exportData()">Export data as JSON</button><label class="btn" style="cursor:pointer">Import JSON<input type="file" accept=".json,application/json" style="display:none" onchange="importData(this)"></label><button class="btn" type="button" onclick="if(confirm(\'Clear all NES:Learn data on this device? This cannot be undone.\')){localStorage.removeItem(LS_KEY);location.reload();}">Clear all local data</button></div>';
+  openSheet(html,S.currentLang);
+}
 function renderProfile(){
-  var html='<h2>Profile</h2><div class="card"><label for="nameEdit">Your name</label><input class="input" id="nameEdit" value="'+esc(S.name)+'"><button class="btn btn-primary" style="margin-top:10px" type="button" onclick="S.name=document.getElementById(\'nameEdit\').value.trim()||S.name;save();toast(\'Name saved\');render()">Save name</button></div>';
-  html+='<h3>Selected languages</h3><div class="card">'+Object.keys(LANG_DB).map(function(c){var on=S.selected.indexOf(c)>=0;return '<label style="display:flex;gap:10px;align-items:center"><input type="checkbox" '+(on?'checked':'')+' onchange="toggleLang('+q(c)+',this.checked)"> '+esc(LANG_DB[c].name)+'</label>';}).join("")+'<p class="note">At least one language must stay selected.</p></div>';
-  html+='<h3>Preferences</h3><div class="card"><label>Theme</label><select class="input" id="themeSel" onchange="S.prefs.theme=this.value;save();render()"><option value="light" '+(S.prefs.theme==="light"?'selected':'')+'>Light</option><option value="dark" '+(S.prefs.theme==="dark"?'selected':'')+'>Dark</option></select><label>Daily goal (minutes)</label><input class="input" type="number" min="5" max="180" id="goalIn" value="'+(S.prefs.dailyGoalMin||20)+'"><button class="btn" style="margin-top:10px" type="button" onclick="S.prefs.dailyGoalMin=parseInt(document.getElementById(\'goalIn\').value)||20;save();render()">Save goal</button><label style="display:flex;gap:10px;align-items:center"><input type="checkbox" '+(S.prefs.voice?'checked':'')+' onchange="S.prefs.voice=this.checked;save()"> Spoken playback where supported</label></div>';
-  html+='<h3>Starting survey and placement</h3><div class="card">'+S.selected.map(function(c){var st=langState(c);return '<p><b>'+esc(LANG_DB[c].name)+'</b> · '+(st.survey?('Survey done'):('No survey yet'))+' · '+(st.diag?('Placed at '+st.diag.level):(st.diagSkipped?'Placement skipped, starting at A1':'No placement yet'))+'</p><div style="display:flex;flex-wrap:wrap;gap:8px;margin-bottom:10px"><button class="btn btn-sm" type="button" onclick="openSurvey('+q(c)+')">Retake survey</button><button class="btn btn-sm" type="button" onclick="startDiag('+q(c)+')">Retake placement test</button></div>';}).join("")+'</div>';
+  var done=totalLessonsDone(),words=totalWordsLearned(),streak=maxStreak();
+  var totalSecs=0;Object.keys(S.langs).forEach(function(c){totalSecs+=S.langs[c].studySeconds;});
+  var html='<h2>Profile</h2>';
+  html+='<div class="card"><div style="display:flex;gap:12px;align-items:center">'+flagHtml(S.currentLang,true)+'<div><h3 style="margin:0">'+esc(S.name)+'</h3><p style="margin:2px 0 0">Learning '+esc(LANG_DB[S.currentLang].name)+' · '+currentLevel(S.currentLang)+' '+LEVEL_NAMES[currentLevel(S.currentLang)]+'</p></div></div>';
+  html+='<div class="stat" style="margin-top:14px"><div class="card"><b>'+done+'</b><span>Lessons done</span></div><div class="card"><b>'+words+'</b><span>Words learned</span></div><div class="card"><b>'+streak+' days</b><span>Best streak</span></div><div class="card"><b>'+Math.round(totalSecs/60)+' min</b><span>Study time</span></div></div></div>';
+  html+='<h3>Menu</h3>';
+  html+='<button class="menu-row" type="button" onclick="openSavedWords()">'+icon("book")+'<span>My Vocabulary<small>Words you saved</small></span><span class="chev">›</span></button>';
+  html+='<button class="menu-row" type="button" onclick="openSavedLessons()">'+icon("check")+'<span>Saved Lessons<small>Lessons you completed</small></span><span class="chev">›</span></button>';
+  html+='<button class="menu-row" type="button" onclick="openAchievements()">'+icon("star")+'<span>Achievements<small>Badges earned from your real progress</small></span><span class="chev">›</span></button>';
+  html+='<button class="menu-row" type="button" onclick="setTab('+q("progress")+')">'+icon("chart")+'<span>Statistics<small>Weekly activity, mastery, and test history</small></span><span class="chev">›</span></button>';
+  html+='<button class="menu-row" type="button" onclick="openSettings()">'+icon("pen")+'<span>Settings<small>Theme, daily goal, name, and your data</small></span><span class="chev">›</span></button>';
+  html+='<h3>Selected languages</h3><div class="card">'+Object.keys(LANG_DB).map(function(c){var on=S.selected.indexOf(c)>=0;return '<label style="display:flex;gap:10px;align-items:center">'+flagHtml(c)+' <input type="checkbox" '+(on?'checked':'')+' onchange="toggleLang('+q(c)+',this.checked)"> '+esc(LANG_DB[c].name)+'</label>';}).join("")+'<p class="note">At least one language must stay selected.</p></div>';
+  html+='<h3>Starting survey and placement</h3><div class="card">'+S.selected.map(function(c){var st=langState(c);return '<p><b>'+flagHtml(c)+' '+esc(LANG_DB[c].name)+'</b> · '+(st.survey?('Survey done'):('No survey yet'))+' · '+(st.diag?('Placed at '+st.diag.level):(st.diagSkipped?'Placement skipped, starting at A1':'No placement yet'))+'</p><div style="display:flex;flex-wrap:wrap;gap:8px;margin-bottom:10px"><button class="btn btn-sm" type="button" onclick="openSurvey('+q(c)+')">Retake survey</button><button class="btn btn-sm" type="button" onclick="startDiag('+q(c)+')">Retake placement test</button></div>';}).join("")+'</div>';
+  html+='<h3>Free Resources</h3>'+renderResourcesHtml();
   html+='<h3>About this app</h3><div class="card" style="display:flex;flex-wrap:wrap;gap:8px"><button class="btn" type="button" onclick="showTutorial(0)">Replay tutorial</button><button class="btn" type="button" onclick="showReadFirst()">Read Before You Use The App</button><a class="btn" href="terms.html" target="_blank" rel="noopener">Terms and Conditions</a><a class="btn" href="privacy.html" target="_blank" rel="noopener">Privacy Policy</a><a class="btn" href="cookies.html" target="_blank" rel="noopener">Cookie Policy</a></div>';
   html+='<h3>Local data controls</h3><div class="card" style="display:flex;flex-wrap:wrap;gap:8px"><button class="btn" type="button" onclick="exportData()">Export data as JSON</button><label class="btn" style="cursor:pointer">Import JSON<input type="file" accept=".json,application/json" style="display:none" onchange="importData(this)"></label><button class="btn" type="button" onclick="if(confirm(\'Clear all NES:Learn data on this device? This cannot be undone.\')){localStorage.removeItem(LS_KEY);location.reload();}">Clear all local data</button></div>';
   return html;
@@ -1092,6 +1332,7 @@ function importData(input){
 function render(){
   regenEnergy();updateEnergyBadge();
   renderTabs();
+  var cf=document.getElementById("curFlag");if(cf)cf.innerHTML=flagSvg(S.currentLang);
   if(!S.name){document.getElementById("app").innerHTML=renderOnboarding();return;}
   var html="";
   if(TAB==="home")html=renderHome();
@@ -1138,7 +1379,7 @@ function dictBodyHtml(){
 function dictSheetHtml(){
   var code=DICT_STATE.code;
   var picker=Object.keys(LANG_DB).map(function(c){
-    return '<button class="btn btn-sm" type="button" onclick="openDictionary('+q(c)+')"'+(c===code?' style="border-color:var(--brand)"':'')+'>'+esc(LANG_DB[c].name)+'</button>';
+    return '<button class="btn btn-sm" type="button" onclick="openDictionary('+q(c)+')"'+(c===code?' style="border-color:var(--brand)"':'')+'>'+flagHtml(c)+' '+esc(LANG_DB[c].name)+'</button>';
   }).join("");
   return sheetHead("Dictionary: "+LANG_DB[code].name,"A growing dictionary, not a complete dictionary of any language. Curriculum words come from NES:Learn lessons. Imported words credit their source on each entry.")
     +'<div style="display:flex;flex-wrap:wrap;gap:8px;margin:12px 0">'+picker+'</div>'
